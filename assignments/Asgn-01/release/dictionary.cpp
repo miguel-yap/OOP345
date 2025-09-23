@@ -1,3 +1,12 @@
+/* 
+The function from line (20-27) was generated with the help of ChatGPT.
+The function from line (29-34) was generated with the help of ChatGPT.
+The function from line (37-49) was generated with the help of ChatGPT.
+The function from line (51-92) was generated with the help of ChatGPT.
+The function from the line (159-200) was generated with the help of ChatGPT.
+*/
+
+
 #include "dictionary.h"
 #include "settings.h"
 #include <fstream>
@@ -39,7 +48,6 @@ PartOfSpeech Dictionary::posFrom(const std::string& rawIn) {
     return PartOfSpeech::Unknown;
 }
 
-// constructor: load from file
 Dictionary::Dictionary(const char* filename) {
     std::ifstream fin(filename);
     if (!fin) {
@@ -83,12 +91,12 @@ Dictionary::Dictionary(const char* filename) {
     }
 }
 
-// destructor
+
 Dictionary::~Dictionary() {
     delete[] m_words;
 }
 
-// copy ctor
+
 Dictionary::Dictionary(const Dictionary& other) {
     m_size = other.m_size;
     if (m_size > 0) {
@@ -99,7 +107,6 @@ Dictionary::Dictionary(const Dictionary& other) {
     }
 }
 
-// copy assign
 Dictionary& Dictionary::operator=(const Dictionary& other) {
     if (this != &other) {
         delete[] m_words;
@@ -116,14 +123,12 @@ Dictionary& Dictionary::operator=(const Dictionary& other) {
     return *this;
 }
 
-// move ctor
 Dictionary::Dictionary(Dictionary&& other) noexcept
     : m_words(other.m_words), m_size(other.m_size) {
     other.m_words = nullptr;
     other.m_size = 0;
 }
 
-// move assign
 Dictionary& Dictionary::operator=(Dictionary&& other) noexcept {
     if (this != &other) {
         delete[] m_words;
@@ -135,7 +140,6 @@ Dictionary& Dictionary::operator=(Dictionary&& other) noexcept {
     return *this;
 }
 
-// output PartOfSpeech
 std::ostream& operator<<(std::ostream& os, PartOfSpeech p) {
     switch (p) {
         case PartOfSpeech::Noun:         os << "noun"; break;
@@ -152,7 +156,6 @@ std::ostream& operator<<(std::ostream& os, PartOfSpeech p) {
 }
 
 
-// searchWord
 void Dictionary::searchWord(const char* w) const {
     std::string query = w ? w : "";
     if (query.empty()) {

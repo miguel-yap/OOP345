@@ -1,3 +1,8 @@
+/* 
+The function void TimeMonitor::startEvent(const char* name) (lines 11-15) was generated with the help of ChatGPT.
+The function Event TimeMonitor::stopEvent() (line 17-22) was generated with the help of ChatGPT.
+*/
+
 #include "timeMonitor.h"
 #include <utility>
 

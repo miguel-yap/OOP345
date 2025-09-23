@@ -1,3 +1,8 @@
+/*
+I declare that this submission is the result of my own work and I only copied the code that my professor provided to complete my assignments. 
+This submitted piece of work has not been shared with any other student or 3rd party content provider.
+*/
+
 #ifndef SENECA_EVENT_H
 #define SENECA_EVENT_H
 
@@ -18,6 +23,6 @@ namespace seneca {
             friend std::ostream& operator<<(std::ostream& os, const Event& e);
 
     };
-}
+} // namespace seneca
 
-#endif // SENECA_EVENT_H
+#endif 

@@ -1,3 +1,8 @@
+/* 
+The function void logger::grow(std::size_t newCap) (lines 10-17) was generated with the help of ChatGPT.
+The function void logger::addEvent(const Event& event) (line 42-47) was generated with the help of ChatGPT.
+*/
+
 #include "logger.h"
 
 namespace seneca {

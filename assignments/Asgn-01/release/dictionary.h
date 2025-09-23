@@ -1,3 +1,8 @@
+/*
+I declare that this submission is the result of my own work and I only copied the code that my professor provided to complete my assignments. 
+This submitted piece of work has not been shared with any other student or 3rd party content provider.
+*/
+
 #ifndef SENECA_DICTIONARY_H
 #define SENECA_DICTIONARY_H
 
@@ -36,13 +41,12 @@ public:
     Dictionary() = default;
     explicit Dictionary(const char* filename);
 
-    // Rule of five
     ~Dictionary();
 
-    Dictionary(const Dictionary& other);                // deep copy ctor
-    Dictionary& operator=(const Dictionary& other);     // deep copy assign
-    Dictionary(Dictionary&& other) noexcept;            // move ctor
-    Dictionary& operator=(Dictionary&& other) noexcept; // move assign
+    Dictionary(const Dictionary& other);                
+    Dictionary& operator=(const Dictionary& other);     
+    Dictionary(Dictionary&& other) noexcept;           
+    Dictionary& operator=(Dictionary&& other) noexcept; 
 
     void searchWord(const char* word) const;
 
@@ -50,7 +54,6 @@ public:
     bool empty() const { return m_size == 0; }
 };
 
-// helper: print part of speech
 std::ostream& operator<<(std::ostream& os, PartOfSpeech p);
 
 } // namespace seneca
