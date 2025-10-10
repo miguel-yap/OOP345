@@ -25,13 +25,15 @@ public:
     }
 
     void takeDamage(int dmg) override {
-        m_health -= dmg;
-        if (static_cast<int>(m_health) <= 0)
-            std::cout << getName() << " has been defeated!" << std::endl;
-        else
-            std::cout << getName() << " took " << dmg
-                      << " damage, " << static_cast<int>(m_health)
-                      << " health remaining." << std::endl;
+    m_health -= dmg;
+
+    if (static_cast<int>(m_health) <= 0) {
+        std::cout << getName() << " has been defeated!" << std::endl;
+    } else {
+        std::cout << "    " << getName()
+                  << " took " << dmg
+                  << " damage, " << static_cast<int>(m_health)
+                  << " health remaining." << std::endl;
     }
 
     int getHealth() const override { return static_cast<int>(m_health); }
