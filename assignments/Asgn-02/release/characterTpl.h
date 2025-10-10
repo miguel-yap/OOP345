@@ -34,7 +34,7 @@ namespace seneca {
         std::cout << getName() << " has been defeated!" << std::endl;
     } else {
         // <-- 5 spaces before everything else
-        std::cout << "     " << getName()
+        std::cout << "    " << getName()
                   << " took " << dmg
                   << " damage, " << static_cast<int>(m_health)
                   << " health remaining." << std::endl;
