@@ -27,17 +27,19 @@ namespace seneca {
         }
 
         void takeDamage(int dmg) override {
-            m_health -= dmg;
+    m_health -= dmg;
 
-            if (static_cast<int>(m_health) <= 0) {
-                std::cout << getName() << " has been defeated!" << std::endl;
-            } else {
-                std::cout << "    " << getName()
-                          << " took " << dmg
-                          << " damage, " << static_cast<int>(m_health)
-                          << " health remaining." << std::endl;
-            }
-        }
+    if (static_cast<int>(m_health) <= 0) {
+        // NO INDENT for defeat message (matches professor’s output)
+        std::cout << getName() << " has been defeated!" << std::endl;
+    } else {
+        // EXACTLY 4 SPACES before the line (matrix expects this)
+        std::cout << "    " << getName()
+                  << " took " << dmg
+                  << " damage, " << static_cast<int>(m_health)
+                  << " health remaining." << std::endl;
+    }
+}
 
         int getHealth() const override {
             return static_cast<int>(m_health);
