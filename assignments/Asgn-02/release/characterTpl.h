@@ -29,17 +29,18 @@ namespace seneca {
         void takeDamage(int dmg) override {
     m_health -= dmg;
 
-    if (static_cast<int>(m_health) <= 0) {
-        // no leading spaces for defeat message
+    int current = static_cast<int>(m_health);
+    if (current <= 0) {
+        m_health = 0; // ensure no negatives
         std::cout << "    " << getName() << " has been defeated!" << std::endl;
     } else {
-        // <-- 5 spaces before everything else
         std::cout << "    " << getName()
                   << " took " << dmg
-                  << " damage, " << static_cast<int>(m_health)
+                  << " damage, " << current
                   << " health remaining." << std::endl;
     }
 }
+
 
 
         int getHealth() const override {
