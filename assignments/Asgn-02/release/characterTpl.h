@@ -30,16 +30,17 @@ namespace seneca {
     m_health -= dmg;
 
     if (static_cast<int>(m_health) <= 0) {
-        // NO INDENT for defeat message (matches professor’s output)
+        // no leading spaces for defeat message
         std::cout << getName() << " has been defeated!" << std::endl;
     } else {
-        // EXACTLY 4 SPACES before the line (matrix expects this)
-        std::cout << getName()
+        // <-- 5 spaces before everything else
+        std::cout << "     " << getName()
                   << " took " << dmg
                   << " damage, " << static_cast<int>(m_health)
                   << " health remaining." << std::endl;
     }
 }
+
 
         int getHealth() const override {
             return static_cast<int>(m_health);
