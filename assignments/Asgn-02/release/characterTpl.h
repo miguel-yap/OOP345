@@ -31,7 +31,7 @@ namespace seneca {
 
     if (static_cast<int>(m_health) <= 0) {
         // no leading spaces for defeat message
-        std::cout << getName() << " has been defeated!" << std::endl;
+        std::cout << "    " << getName() << " has been defeated!" << std::endl;
     } else {
         // <-- 5 spaces before everything else
         std::cout << "    " << getName()
