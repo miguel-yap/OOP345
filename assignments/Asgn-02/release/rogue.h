@@ -1,3 +1,14 @@
+/* Citation and Sources...
+Assignment 02
+Module: rogue
+Filename: rogue.h
+Author: Miguel Yap, StNo: 168049237, Email: myap1@myseneca.ca
+-----------------------------------------------------------
+- Line 35-38 was assisted with the help of ChatGPT.
+- Line 50-64 was assisted with the help of ChatGPT.
+- Line 68-80 was assisted with the help of ChatGPT.
+-----------------------------------------------------------*/
+
 #ifndef SENECA_ROGUE_H
 #define SENECA_ROGUE_H
 
@@ -21,7 +32,8 @@ public:
         : CharacterTpl<T>(name, healthMax),
           m_baseDefense(baseDefense),
           m_baseAttack(baseAttack) {}
-
+    
+    // The following display function implementation was developed with guidance from ChatGPT.
     int getAttackAmnt() const override {
         double weaponDamage = static_cast<double>(m_weapon);
         return static_cast<int>(m_baseAttack + 2 * weaponDamage);
@@ -35,6 +47,7 @@ public:
         return new Rogue(*this);
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     void attack(Character* enemy) override {
         std::cout << this->getName() << " is attacking " << enemy->getName() << "." << std::endl;
 
@@ -51,6 +64,7 @@ public:
         enemy->takeDamage(dmg);
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     void takeDamage(int dmg) override {
         std::cout << this->getName() << " is attacked for " << dmg << " damage." << std::endl;
         std::cout << "    Rogue has a defense of " << m_baseDefense

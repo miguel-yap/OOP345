@@ -4,7 +4,7 @@ Module: characterTpl
 Filename: characterTpl.h
 Author: Miguel Yap, StNo: 168049237, Email: myap1@myseneca.ca
 -----------------------------------------------------------
-- Line 31-42 was assisted with the help of ChatGPT.
+- Line 30-43 was assisted with the help of ChatGPT.
 -----------------------------------------------------------*/
 
 #ifndef SENECA_CHARACTERTPL_H
@@ -26,22 +26,21 @@ namespace seneca {
             m_health = healthMax;
         }
 
+        // The following display function implementation was developed with guidance from ChatGPT.
         void takeDamage(int dmg) override {
-    m_health -= dmg;
+            m_health -= dmg;
 
-    int current = static_cast<int>(m_health);
-    if (current <= 0) {
-        m_health = 0; // ensure no negatives
-        std::cout << "    " << getName() << " has been defeated!" << std::endl;
-    } else {
-        std::cout << "    " << getName()
-                  << " took " << dmg
-                  << " damage, " << current
-                  << " health remaining." << std::endl;
-    }
-}
-
-
+            int current = static_cast<int>(m_health);
+            if (current <= 0) {
+                m_health = 0;
+                std::cout << "    " << getName() << " has been defeated!" << std::endl;
+            } else {
+                std::cout << "    " << getName()
+                          << " took " << dmg
+                          << " damage, " << current
+                          << " health remaining." << std::endl;
+            }
+        }
 
         int getHealth() const override {
             return static_cast<int>(m_health);

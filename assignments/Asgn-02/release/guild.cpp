@@ -1,3 +1,13 @@
+/* Citation and Sources...
+Assignment 02
+Module: guild
+Filename: guild.cpp
+Author: Miguel Yap, StNo: 168049237, Email: myap1@myseneca.ca
+-----------------------------------------------------------
+- Line 51-61 was assisted with the help of ChatGPT.
+- Line 69-87 was assisted with the help of ChatGPT.
+- Line 91-107 was assisted with the help of ChatGPT.
+-----------------------------------------------------------*/
 #include "guild.h"
 #include <algorithm>
 
@@ -39,6 +49,7 @@ Guild::Guild(Guild&& other) noexcept {
     *this = std::move(other);
 }
 
+// The following display function implementation was developed with guidance from ChatGPT.
 Guild& Guild::operator=(Guild&& other) noexcept {
     if (this != &other) {
         clear();
@@ -55,6 +66,7 @@ Guild::~Guild() {
     clear(); 
 }
 
+// The following display function implementation was developed with guidance from ChatGPT.
 void Guild::addMember(Character* c) {
     if (!c)
         return;
@@ -75,6 +87,7 @@ void Guild::addMember(Character* c) {
     c->setHealthMax(c->getHealthMax() + 300);
 }
 
+// The following display function implementation was developed with guidance from ChatGPT.
 void Guild::removeMember(const std::string& name) {
     for (size_t i = 0; i < m_count; ++i) {
         if (m_members[i]->getName() == name) {

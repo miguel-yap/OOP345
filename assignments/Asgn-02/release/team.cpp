@@ -1,3 +1,13 @@
+/* Citation and Sources...
+Assignment 02
+Module: team
+Filename: team.cpp
+Author: Miguel Yap, StNo: 168049237, Email: myap1@myseneca.ca
+-----------------------------------------------------------
+- Line 52-62 was assisted with the help of ChatGPT.
+- Line 70-87 was assisted with the help of ChatGPT.
+- Line 91-105 was assisted with the help of ChatGPT.
+-----------------------------------------------------------*/
 #include "team.h"
 
 namespace seneca {
@@ -40,6 +50,7 @@ Team::Team(Team&& other) noexcept {
     *this = std::move(other);
 }
 
+// The following display function implementation was developed with guidance from ChatGPT.
 Team& Team::operator=(Team&& other) noexcept {
     if (this != &other) {
         clear();
@@ -56,6 +67,7 @@ Team::~Team() {
     clear();
 }
 
+// The following display function implementation was developed with guidance from ChatGPT.
 void Team::addMember(const Character* c) {
     if (!c)
         return;
@@ -75,6 +87,7 @@ void Team::addMember(const Character* c) {
     ++m_count;
 }
 
+// The following display function implementation was developed with guidance from ChatGPT.
 void Team::removeMember(const std::string& name) {
     for (size_t i = 0; i < m_count; ++i) {
         if (m_members[i]->getName() == name) {

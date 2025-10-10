@@ -1,3 +1,13 @@
+/* Citation and Sources...
+Assignment 02
+Module: archer
+Filename: archer.h
+Author: Miguel Yap, StNo: 168049237, Email: myap1@myseneca.ca
+-----------------------------------------------------------
+- Line 47-55 was assisted with the help of ChatGPT.
+- Line 58-67 was assisted with the help of ChatGPT.
+-----------------------------------------------------------*/
+
 #ifndef SENECA_ARCHER_H
 #define SENECA_ARCHER_H
 
@@ -33,6 +43,7 @@ public:
         return new Archer(*this);
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     void attack(Character* enemy) override {
         std::cout << this->getName() << " is attacking " << enemy->getName() << "." << std::endl;
 
@@ -43,6 +54,7 @@ public:
         enemy->takeDamage(dmg);
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     void takeDamage(int dmg) override {
         std::cout << this->getName() << " is attacked for " << dmg << " damage." << std::endl;
         std::cout << "    Archer has a defense of " << getDefenseAmnt()
