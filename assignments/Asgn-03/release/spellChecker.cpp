@@ -1,9 +1,23 @@
+/* Citation and Sources.... 
+Assignment 03
+Module: spellChecker
+FileName: spellChecker.cpp
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 16, 2025
+------------------------------------------------------------------
+- Line 21-33 was assisted with the help of ChatGPT.
+- Line 34-49 was assisted with the help of ChatGPT.
+------------------------------------------------------------------*/
 #include <fstream>
 #include <iomanip>
 #include "spellChecker.h"
 
 namespace seneca
 {
+// The following display function implementation was developed with guidance from ChatGPT.
     SpellChecker::SpellChecker(const char* filename)
     {
         std::ifstream file(filename);
@@ -18,6 +32,7 @@ namespace seneca
         }
     }
 
+// The following display function implementation was developed with guidance from ChatGPT.
     void SpellChecker::operator()(std::string& text)
     {
         for (size_t i = 0; i < m_badWords.size(); ++i)
@@ -41,7 +56,7 @@ namespace seneca
     for (size_t i = 0; i < m_badWords.size(); ++i)
     {
         out << std::left << std::setw(15) << m_badWords[i]
-            << ": "                      // <-- EXACT formatting
+            << ": "                      
             << m_replacements[i]
             << " replacements\n";
     }

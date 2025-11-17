@@ -1,3 +1,19 @@
+/* Citation and Sources.... 
+Assignment 03
+Module: collection
+FileName: collection.cpp
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 16, 2025
+------------------------------------------------------------------
+- Line 47-71 was assisted with the help of ChatGPT.
+- Line 75-85 was assisted with the help of ChatGPT.
+- Line 89-99 was assisted with the help of ChatGPT.
+- Line 103-123 was assisted with the help of ChatGPT.
+- Line 127-147 was assisted with the help of ChatGPT.
+------------------------------------------------------------------*/
 #include <stdexcept>
 #include <numeric>
 #include <functional>
@@ -31,12 +47,12 @@ namespace seneca
         m_observer = observer;
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     Collection& Collection::operator+=(MediaItem* item)
     {
         if (!item)
             return *this;
 
-        // check duplicates by title
         auto it = std::find_if(
             m_items.begin(), m_items.end(),
             [t = item->getTitle()](MediaItem* existing)
@@ -58,6 +74,7 @@ namespace seneca
         return *this;
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     MediaItem* Collection::operator[](size_t idx) const
     {
         if (idx >= m_items.size())
@@ -70,6 +87,7 @@ namespace seneca
         return m_items[idx];
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     MediaItem* Collection::operator[](const std::string& title) const
     {
         auto it = std::find_if(
@@ -82,6 +100,7 @@ namespace seneca
         return (it != m_items.end()) ? *it : nullptr;
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     void Collection::removeQuotes()
     {
         std::for_each(
@@ -104,6 +123,7 @@ namespace seneca
             });
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     void Collection::sort(const std::string& field)
     {
         if (field == "title")
@@ -124,7 +144,6 @@ namespace seneca
                     return a->getYear() < b->getYear();
                 });
         }
-        // any other field string -> do nothing
     }
 
     std::ostream& operator<<(std::ostream& out, const Collection& c)

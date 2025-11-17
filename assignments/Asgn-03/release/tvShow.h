@@ -1,3 +1,16 @@
+/* Citation and Sources.... 
+Assignment 03
+Module: tvShow
+FileName: tvShow.h
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 16, 2025
+------------------------------------------------------------------
+I declare that this submission is the result of my own work and I only copied the code that my professor provided to complete my assignments. 
+This submitted piece of work has not been shared with any other student or 3rd party content provider.
+------------------------------------------------------------------*/
 #ifndef SENECA_TVSHOW_H
 #define SENECA_TVSHOW_H
 
@@ -12,7 +25,7 @@
 
 namespace seneca
 {
-    class TvShow;   // forward for TvEpisode
+    class TvShow;   
 
     struct TvEpisode
     {
@@ -21,7 +34,7 @@ namespace seneca
         unsigned short m_season{};
         unsigned short m_numberInSeason{};
         std::string m_airDate{};
-        unsigned int m_length{};      // seconds
+        unsigned int m_length{};      
         std::string m_title{};
         std::string m_summary{};
     };
@@ -38,7 +51,6 @@ namespace seneca
 
         static unsigned int parseLengthToSeconds(const std::string& lenStr)
         {
-            // expects HH:MM:SS
             std::stringstream ss(lenStr);
             std::string h, m, s;
             std::getline(ss, h, ':');
@@ -91,14 +103,13 @@ namespace seneca
             unsigned short overall = static_cast<unsigned short>(std::stoul(overallStr));
             unsigned short season;
             if (seasonStr.empty())
-                season = 1u; // default season 1
+                season = 1u; 
             else
                 season = static_cast<unsigned short>(std::stoul(seasonStr));
 
             unsigned short inSeason = static_cast<unsigned short>(std::stoul(inSeasonStr));
             unsigned int lengthSec = parseLengthToSeconds(lengthStr);
 
-            // find TvShow with this id in the collection
             TvShow* showPtr = nullptr;
             for (size_t i = 0; i < col.size(); ++i)
             {

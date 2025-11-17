@@ -1,3 +1,16 @@
+/* Citation and Sources.... 
+Assignment 03
+Module: book
+FileName: book.h
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 16, 2025
+------------------------------------------------------------------
+I declare that this submission is the result of my own work and I only copied the code that my professor provided to complete my assignments. 
+This submitted piece of work has not been shared with any other student or 3rd party content provider.
+------------------------------------------------------------------*/
 #ifndef SENECA_BOOK_H
 #define SENECA_BOOK_H
 
@@ -13,7 +26,6 @@ namespace seneca
         std::string m_country{};
         double      m_price{};
 
-        // No public constructors – only factory
         Book(const std::string& author,
              const std::string& title,
              const std::string& country,
@@ -24,7 +36,6 @@ namespace seneca
     public:
         void display(std::ostream& out = std::cout) const override;
 
-        // Factory
         static Book* createItem(const std::string& strBook);
     };
 }

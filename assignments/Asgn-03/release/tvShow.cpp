@@ -1,3 +1,18 @@
+/* Citation and Sources.... 
+Assignment 03
+Module: tvShow
+FileName: tvShow.cpp
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 16, 2025
+------------------------------------------------------------------
+- Line 86-113 was assisted with the help of ChatGPT.
+- Line 117-130 was assisted with the help of ChatGPT.
+- Line 134-151 was assisted with the help of ChatGPT.
+------------------------------------------------------------------*/
+
 #include <iomanip>
 #include "tvShow.h"
 
@@ -66,7 +81,8 @@ namespace seneca
                 << std::setfill(' ') << '\n';
         }
     }
-
+    
+    // The following display function implementation was developed with guidance from ChatGPT.
     TvShow* TvShow::createItem(const std::string& strShow)
     {
         std::string line = strShow;
@@ -96,6 +112,7 @@ namespace seneca
         return new TvShow(id, title, year, summary);
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     double TvShow::getEpisodeAverageLength() const
     {
         if (m_episodes.empty())
@@ -111,9 +128,9 @@ namespace seneca
         return static_cast<double>(total) / static_cast<double>(m_episodes.size());
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     std::list<std::string> TvShow::getLongEpisodes() const
     {
-        // At least 1 hour = 3600 seconds
         const unsigned int minLen = 3600u;
 
         return std::accumulate(

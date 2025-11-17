@@ -1,3 +1,15 @@
+/* Citation and Sources.... 
+Assignment 03
+Module: movie
+FileName: movie.cpp
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 16, 2025
+------------------------------------------------------------------
+- Line 63-88 was assisted with the help of ChatGPT.
+------------------------------------------------------------------*/
 #include <sstream>
 #include <iomanip>
 #include "movie.h"
@@ -47,6 +59,7 @@ namespace seneca
         }
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     Movie* Movie::createItem(const std::string& strMovie)
     {
         std::string line = strMovie;
@@ -60,7 +73,7 @@ namespace seneca
 
         if (!std::getline(ss, title, ',')) throw "Not a valid movie.";
         if (!std::getline(ss, yearStr, ',')) throw "Not a valid movie.";
-        std::getline(ss, summary);   // last field
+        std::getline(ss, summary);   
 
         MediaItem::trim(title);
         MediaItem::trim(yearStr);

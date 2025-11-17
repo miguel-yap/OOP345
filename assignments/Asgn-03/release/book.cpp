@@ -1,3 +1,15 @@
+/* Citation and Sources.... 
+Assignment 03
+Module: book
+FileName: book.cpp
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 16, 2025
+------------------------------------------------------------------
+- Line 72-105 was assisted with the help of ChatGPT.
+------------------------------------------------------------------*/
 #include <sstream>
 #include <iomanip>
 #include <stdexcept>
@@ -55,7 +67,8 @@ namespace seneca
                 << std::setfill(' ') << '\n';
         }
     }
-
+    
+    // The following display function implementation was developed with guidance from ChatGPT.
     Book* Book::createItem(const std::string& strBook)
     {
         std::string line = strBook;
@@ -72,7 +85,7 @@ namespace seneca
         if (!std::getline(ss, country, ',')) throw "Not a valid book.";
         if (!std::getline(ss, priceStr, ',')) throw "Not a valid book.";
         if (!std::getline(ss, yearStr, ',')) throw "Not a valid book.";
-        std::getline(ss, summary);   // last field: may contain commas
+        std::getline(ss, summary);   
 
         MediaItem::trim(author);
         MediaItem::trim(title);
