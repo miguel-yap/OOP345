@@ -14,28 +14,29 @@ namespace seneca {
 
         m_id = ++id_generator;
 
-        // item name
+        // 1) Item name
         m_itemName = util.extractToken(record, pos, more);
 
-        // serial number
+        // IMPORTANT: widthField should be based ONLY on the item name
+        if (util.getFieldWidth() > m_widthField) {
+            m_widthField = util.getFieldWidth();
+        }
+
+        // 2) Serial number
         if (more) {
             std::string token = util.extractToken(record, pos, more);
             m_serialNumber = static_cast<size_t>(std::stoul(token));
         }
 
-        // quantity
+        // 3) Quantity
         if (more) {
             std::string token = util.extractToken(record, pos, more);
             m_quantity = static_cast<size_t>(std::stoul(token));
         }
 
-        // description
+        // 4) Description
         if (more) {
             m_description = util.extractToken(record, pos, more);
-        }
-
-        if (util.getFieldWidth() > m_widthField) {
-            m_widthField = util.getFieldWidth();
         }
     }
 
