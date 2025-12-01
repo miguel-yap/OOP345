@@ -23,34 +23,34 @@ namespace seneca {
             return false;
         }
 
-        // Get the order at the front
         CustomerOrder& currentOrder = m_orders.front();
         bool filledAtThisStation = currentOrder.isItemFilled(getItemName());
-        bool orderFilled = currentOrder.isOrderFilled();
 
-        // Condition 1: Order is fully filled, OR
-        // Condition 2: Order cannot be filled (not enough inventory at this station), OR
-        // Condition 3: The item is completely filled at this station.
-        if (orderFilled || getQuantity() == 0 || filledAtThisStation) {
-            
+        // Condition 1: Item is filled at this station, OR
+        // Condition 2: We are at the end of the line.
+        if (filledAtThisStation) {
+            // The item required by this station is fully filled for this order. Move it.
             if (m_pNextStation) {
-                // Move to the next workstation
                 *m_pNextStation += std::move(currentOrder);
             } else {
-                // End of the line
-                if (orderFilled) {
+                // End of line. Check completion status.
+                if (currentOrder.isOrderFilled()) {
                     g_completed.push_back(std::move(currentOrder));
                 } else {
                     g_incomplete.push_back(std::move(currentOrder));
                 }
             }
             
-            // Remove the order from the current queue
+            m_orders.pop_front();
+            return true;
+        } else if (m_pNextStation == nullptr) {
+            // At the end of the line, and the item is NOT filled. Must move it to g_incomplete.
+            g_incomplete.push_back(std::move(currentOrder));
             m_orders.pop_front();
             return true;
         }
 
-        return false;
+        return false; // Order needs service and has a next station, so hold it.
     }
 
     void Workstation::setNextStation(Workstation* station) {
