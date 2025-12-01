@@ -1,41 +1,36 @@
-#ifndef SENECA_WORKSTATION_H
-#define SENECA_WORKSTATION_H
+
+
+
+#ifndef SDDS_WORKSTATION_H
+#define SDDS_WORKSTATION_H
 
 #include <deque>
-#include "Station.h"
+#include <iostream>
 #include "CustomerOrder.h"
+#include "Station.h"
 
-namespace seneca {
+using namespace std;
 
-    // global queues
-    extern std::deque<CustomerOrder> g_pending;
-    extern std::deque<CustomerOrder> g_completed;
-    extern std::deque<CustomerOrder> g_incomplete;
+extern deque<sdds::CustomerOrder> g_pending;
+extern deque<sdds::CustomerOrder> g_completed;
+extern deque<sdds::CustomerOrder> g_incomplete;
+
+namespace sdds {
 
     class Workstation : public Station {
-        std::deque<CustomerOrder> m_orders;
-        Workstation* m_pNextStation{nullptr};
+        deque<CustomerOrder> m_orders;
+        Workstation* m_pNextStation = nullptr;
 
     public:
-        Workstation(const std::string& record);
-
-        // no copy/move
-        Workstation(const Workstation&) = delete;
-        Workstation& operator=(const Workstation&) = delete;
-        Workstation(Workstation&&) = delete;
-        Workstation& operator=(Workstation&&) = delete;
-
-        void fill(std::ostream& os);
+        Workstation(const string& data);
+        void fill(ostream& os);
         bool attemptToMoveOrder();
-
-        void setNextStation(Workstation* station);
+        void setNextStation(Workstation* station = nullptr);
         Workstation* getNextStation() const;
-
-        void display(std::ostream& os) const;
-
-        Workstation& operator+=(CustomerOrder&& newOrder);
+        void display(ostream& os) const;
+        Workstation& operator+=(CustomerOrder&& new_Order);
+        bool empty() const;
     };
+};
 
-} // namespace seneca
-
-#endif // SENECA_WORKSTATION_H
+#endif

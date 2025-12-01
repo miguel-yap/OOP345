@@ -1,25 +1,27 @@
-#ifndef SENECA_LINEMANAGER_H
-#define SENECA_LINEMANAGER_H
+
+
+#ifndef SDDS_LINE_MANAGER_H
+#define SDDS_LINE_MANAGER_H
 
 #include <string>
 #include <vector>
+#include <iostream>
 #include "Workstation.h"
 
-namespace seneca {
+using namespace std;
 
+namespace sdds {
     class LineManager {
-        std::vector<Workstation*> m_activeLine;
-        size_t m_cntCustomerOrder{};
-        Workstation* m_firstStation{ nullptr };
+        vector<Workstation*> m_active_Line;
+        size_t m_cntCustomer_Order;
+        Workstation* m_first_Station;
 
     public:
-        LineManager(const std::string& file, const std::vector<Workstation*>& stations);
-
+        LineManager(const string& file, const vector<Workstation*>& stations);
         void reorderStations();
-        bool run(std::ostream& os);
-        void display(std::ostream& os) const;
+        bool run(ostream& os);
+        void display(ostream& os) const;
     };
-
-}
+};
 
 #endif

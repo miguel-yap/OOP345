@@ -1,137 +1,152 @@
-#include "CustomerOrder.h"
-#include "Station.h"
-#include "Utilities.h"
-#include <vector>
-#include <iomanip>
+
+
 #include <stdexcept>
-#include <utility> // Ensure std::move is available
+#include <iostream>
+#include <iomanip>
+#include <utility>
+#include "CustomerOrder.h"
+#include "Utilities.h"
 
-namespace seneca {
+using namespace std;
+using namespace sdds;
 
-    size_t CustomerOrder::m_widthField = 0u;
+size_t CustomerOrder::m_widthField = 0;
 
-    CustomerOrder::CustomerOrder(const std::string& record) {
-        Utilities util;
-        bool more = true;
-        size_t pos = 0u;
+CustomerOrder::CustomerOrder() :
+    m_name{}, m_item{}, m_cntItem{}, m_lstItem{ nullptr } {
 
-        m_name = util.extractToken(record, pos, more);
-        m_product = util.extractToken(record, pos, more);
+}
 
-        std::vector<std::string> items;
+CustomerOrder::CustomerOrder(const string& input) {
+    Utilities utility;
+    size_t pos = 0;
+    bool more = true;
 
-        while (more) {
-            items.push_back(util.extractToken(record, pos, more));
+    m_name = utility.extractToken(input, pos, more);
+    m_item = utility.extractToken(input, pos, more);
+
+    string listOfItems = "";
+    size_t count = 0;
+
+    do {
+        string tmp = utility.extractToken(input, pos, more);
+        if (listOfItems.length() > 0) {
+            listOfItems += Utilities::getDelimiter();
         }
+        listOfItems += tmp;
+        count++;
+    } while (more);
 
-        m_cntItem = items.size();
-        m_lstItem = new Item*[m_cntItem];
+    m_lstItem = new Item * [count];
+    m_cntItem = count;
+    pos = 0;
+    count = 0;
+    more = true;
 
-        for (size_t i = 0; i < m_cntItem; ++i)
-            m_lstItem[i] = new Item(items[i]);
+    do {
+        string tmp = utility.extractToken(listOfItems, pos, more);
+        m_lstItem[count++] = new Item(tmp);
+    } while (more);
 
-        if (util.getFieldWidth() > m_widthField)
-            m_widthField = util.getFieldWidth();
+    if (m_widthField < utility.getFieldWidth()) {
+        m_widthField = utility.getFieldWidth();
     }
+}
 
+CustomerOrder::CustomerOrder(const CustomerOrder& order) {
+    throw string("Copy constructor cannot be called");
+}
 
-    // copy constructor must throw (as per spec / tester)
-    CustomerOrder::CustomerOrder(const CustomerOrder& other) {
-        throw std::runtime_error("Cannot make copies");
-    }
+CustomerOrder::CustomerOrder(CustomerOrder&& order) noexcept :
+    m_name{}, m_item{}, m_cntItem{}, m_lstItem{ nullptr } {
+    *this = move(order);
+}
 
-    CustomerOrder::CustomerOrder(CustomerOrder&& other) noexcept {
-        *this = std::move(other);
-    }
-
-    CustomerOrder& CustomerOrder::operator=(CustomerOrder&& other) noexcept {
-        if (this != &other) {
-            // cleanup current
-            if (m_lstItem) {
-                for (size_t i = 0u; i < m_cntItem; ++i) {
-                    delete m_lstItem[i];
-                }
-                delete[] m_lstItem;
-            }
-
-            m_name = std::move(other.m_name);
-            m_product = std::move(other.m_product);
-            m_cntItem = other.m_cntItem;
-            m_lstItem = other.m_lstItem;
-
-            other.m_cntItem = 0u;
-            other.m_lstItem = nullptr;
-        }
+CustomerOrder& CustomerOrder::operator=(CustomerOrder&& order) noexcept {
+    if (this == &order) {
         return *this;
     }
 
-    CustomerOrder::~CustomerOrder() {
-        if (m_lstItem) {
-            for (size_t i = 0u; i < m_cntItem; ++i) {
-                delete m_lstItem[i];
-            }
-            delete[] m_lstItem;
+    swap(m_name, order.m_name);
+    swap(m_item, order.m_item);
+    swap(m_cntItem, order.m_cntItem);
+    swap(m_lstItem, order.m_lstItem);
+
+    return *this;
+}
+
+CustomerOrder::~CustomerOrder() {
+    for (size_t i = 0; i < m_cntItem; i++) {
+        delete m_lstItem[i];
+    }
+
+    delete[] m_lstItem;
+}
+
+bool CustomerOrder::isOrderFilled() const {
+    size_t count = 0;
+
+    for (size_t i = 0; i < m_cntItem; i++) {
+        if (m_lstItem[i]->m_isFilled) {
+            count++;
         }
     }
 
-    bool CustomerOrder::isOrderFilled() const {
-        for (size_t i = 0u; i < m_cntItem; ++i) {
-            if (!m_lstItem[i]->m_isFilled) {
-                return false;
+    return count == m_cntItem;
+}
+
+bool CustomerOrder::isItemFilled(const string& itemName) const {
+    size_t itemCount = 0;
+    size_t filledCount = 0;
+
+    for (size_t i = 0; i < m_cntItem; i++) {
+        if (m_lstItem[i]->m_itemName == itemName) {
+            itemCount++;
+
+            if (m_lstItem[i]->m_isFilled) {
+                filledCount++;
             }
         }
-        return true;
     }
 
-    bool CustomerOrder::isItemFilled(const std::string& itemName) const {
-        for (size_t i = 0; i < m_cntItem; ++i) {
-            if (m_lstItem[i]->m_itemName == itemName &&
-                !m_lstItem[i]->m_isFilled)
-            {
-                return false;    // found a matching item AND it's NOT filled
-            }
-        }
-        return true; // either item doesn't exist OR all copies are filled
-    }
+    return itemCount == filledCount;
+}
 
-    void CustomerOrder::fillItem(Station& station, std::ostream& os) {
-        for (size_t i = 0u; i < m_cntItem; ++i) {
-            if (m_lstItem[i]->m_itemName == station.getItemName() &&
-                !m_lstItem[i]->m_isFilled) {
+void CustomerOrder::fillItem(Station& station, ostream& os) {
+    for (size_t i = 0; i < m_cntItem; i++) {
 
-                if (station.getQuantity() > 0u) {
-                    m_lstItem[i]->m_serialNumber = station.getNextSerialNumber();
-                    m_lstItem[i]->m_isFilled = true;
-                    station.updateQuantity();
+        if (m_lstItem[i]->m_isFilled == false && m_lstItem[i]->m_itemName == station.getItemName()) {
 
-                    // Message format confirmed correct (4 spaces, terminated by \n)
-                    os << "    Filled " << m_name << ", " << m_product
-                       << " [" << station.getItemName() << "]\n";
-                } else {
-                    // Message format confirmed correct (4 spaces, terminated by \n)
-                    os << "    Unable to fill " << m_name << ", " << m_product
-                       << " [" << station.getItemName() << "]\n";
-                }
-                // only first matching unfilled item processed
+            if (station.getQuantity() > 0) {
+
+                m_lstItem[i]->m_serialNumber = station.getNextSerialNumber();
+                m_lstItem[i]->m_isFilled = true;
+                station.updateQuantity();
+                os << setw(11) << right;
+                os << "Filled " << m_name << ", " << m_item << " [" << m_lstItem[i]->m_itemName << "]" << endl;
                 break;
+
+            }
+            else {
+
+                os << "    Unable to fill " << m_name << ", " << m_item << " [" << m_lstItem[i]->m_itemName << "]" << endl;
+
             }
         }
     }
 
-    void CustomerOrder::display(std::ostream& os) const {
-        os << m_name << " - " << m_product << '\n';
-        for (size_t i = 0u; i < m_cntItem; ++i) {
-            os << "[";
-            
-            // FIX: Ensure explicit right justification for serial number padding
-            os << std::right << std::setw(6) << std::setfill('0') << m_lstItem[i]->m_serialNumber;
-            
-            os << "] ";
-            // Ensure proper left justification for item name
-            os << std::left << std::setw(m_widthField) << std::setfill(' ')
-               << m_lstItem[i]->m_itemName << " - ";
-            os << (m_lstItem[i]->m_isFilled ? "FILLED" : "TO BE FILLED") << '\n';
-        }
-    }
 
-} // namespace seneca
+}
+
+void CustomerOrder::display(ostream& os) const {
+    os << m_name << " - " << m_item << endl;
+
+    for (size_t i = 0; i < m_cntItem; i++) {
+        os << std::right;
+        os << "[" << setw(6) << setfill('0') << m_lstItem[i]->m_serialNumber << "] ";
+        os << setfill(' ') << left;
+        os << setw(m_widthField + 2) << m_lstItem[i]->m_itemName << " - ";
+        os << (m_lstItem[i]->m_isFilled ? "FILLED" : "TO BE FILLED");
+        os << endl;
+    }
+}

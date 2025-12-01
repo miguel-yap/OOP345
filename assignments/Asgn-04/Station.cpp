@@ -1,74 +1,56 @@
+
+
+
+#include <iostream>
+#include <iomanip>
 #include "Station.h"
 #include "Utilities.h"
-#include <iomanip>
 
-namespace seneca {
+size_t sdds::Station::m_widthField = 0;
+int sdds::Station::id_generator = 0;
 
-    size_t Station::m_widthField = 0u;
-    int Station::id_generator = 0;
+sdds::Station::Station(const string& record) {
+    Utilities utilities;
+    size_t next_pos = 0;
+    bool more = true;
 
-    Station::Station(const std::string& record) {
-        Utilities util;
-        bool more = true;
-        size_t pos = 0u;
+    id = ++id_generator;
+    name = utilities.extractToken(record, next_pos, more);
+    nextSerialNo = stoi(utilities.extractToken(record, next_pos, more));
+    noItems = stoi(utilities.extractToken(record, next_pos, more));
+    m_widthField = m_widthField > utilities.getFieldWidth() ? m_widthField : utilities.getFieldWidth();
+    desc = utilities.extractToken(record, next_pos, more);
+}
 
-        m_id = ++id_generator;
+const string& sdds::Station::getItemName() const {
+    return name;
+}
 
-        // 1) Item name
-        m_itemName = util.extractToken(record, pos, more);
+size_t sdds::Station::getNextSerialNumber() {
+    return nextSerialNo++;
+}
 
-        // IMPORTANT: widthField should be based ONLY on the item name
-        if (util.getFieldWidth() > m_widthField) {
-            m_widthField = util.getFieldWidth();
-        }
+size_t sdds::Station::getQuantity() const {
+    return noItems;
+}
 
-        // 2) Serial number
-        if (more) {
-            std::string token = util.extractToken(record, pos, more);
-            m_serialNumber = static_cast<size_t>(std::stoul(token));
-        }
+void sdds::Station::updateQuantity() {
+    if (noItems > 0) {
+        noItems--;
+    }
+}
 
-        // 3) Quantity
-        if (more) {
-            std::string token = util.extractToken(record, pos, more);
-            m_quantity = static_cast<size_t>(std::stoul(token));
-        }
+void sdds::Station::display(ostream& os, bool full) const {
+    os << std::right;
+    os << setw(3) << setfill('0') << id << " | ";
+    os << left << setfill(' ') << setw(m_widthField + 1) << name << " | ";
+    os << right << setw(6) << setfill('0') << nextSerialNo << " | ";
 
-        // 4) Description
-        if (more) {
-            m_description = util.extractToken(record, pos, more);
-        }
+    if (full) {
+        os << setfill(' ');
+        os << right;
+        os << setw(4) << noItems << " | " << desc;
     }
 
-    const std::string& Station::getItemName() const {
-        return m_itemName;
-    }
-
-    size_t Station::getNextSerialNumber() {
-        return m_serialNumber++;
-    }
-
-    size_t Station::getQuantity() const {
-        return m_quantity;
-    }
-
-    void Station::updateQuantity() {
-        if (m_quantity > 0u) {
-            --m_quantity;
-        }
-    }
-
-    void Station::display(std::ostream& os, bool full) const {
-        os << std::setw(3) << std::setfill('0') << m_id << " | ";
-        os << std::left << std::setw(m_widthField) << std::setfill(' ') << m_itemName << " | ";
-        os << std::right << std::setw(6) << std::setfill('0') << m_serialNumber << " | ";
-
-        if (full) {
-            os << std::setfill(' ') << std::setw(4) << m_quantity << " | ";
-            os << m_description;
-        }
-
-        os << '\n';
-    }
-
-} // namespace seneca
+    os << endl;
+}
