@@ -4,34 +4,35 @@
 #include <vector>
 #include <iomanip>
 #include <stdexcept>
+#include <utility> // Ensure std::move is available
 
 namespace seneca {
 
     size_t CustomerOrder::m_widthField = 0u;
 
     CustomerOrder::CustomerOrder(const std::string& record) {
-    Utilities util;
-    bool more = true;
-    size_t pos = 0u;
+        Utilities util;
+        bool more = true;
+        size_t pos = 0u;
 
-    m_name = util.extractToken(record, pos, more);
-    m_product = util.extractToken(record, pos, more);
+        m_name = util.extractToken(record, pos, more);
+        m_product = util.extractToken(record, pos, more);
 
-    std::vector<std::string> items;
+        std::vector<std::string> items;
 
-    while (more) {
-        items.push_back(util.extractToken(record, pos, more));
+        while (more) {
+            items.push_back(util.extractToken(record, pos, more));
+        }
+
+        m_cntItem = items.size();
+        m_lstItem = new Item*[m_cntItem];
+
+        for (size_t i = 0; i < m_cntItem; ++i)
+            m_lstItem[i] = new Item(items[i]);
+
+        if (util.getFieldWidth() > m_widthField)
+            m_widthField = util.getFieldWidth();
     }
-
-    m_cntItem = items.size();
-    m_lstItem = new Item*[m_cntItem];
-
-    for (size_t i = 0; i < m_cntItem; ++i)
-        m_lstItem[i] = new Item(items[i]);
-
-    if (util.getFieldWidth() > m_widthField)
-        m_widthField = util.getFieldWidth();
-}
 
 
     // copy constructor must throw (as per spec / tester)
@@ -83,19 +84,15 @@ namespace seneca {
     }
 
     bool CustomerOrder::isItemFilled(const std::string& itemName) const {
-    for (size_t i = 0; i < m_cntItem; ++i) {
-        if (m_lstItem[i]->m_itemName == itemName &&
-            !m_lstItem[i]->m_isFilled)
-        {
-            return false;    // found a matching item AND it's NOT filled
+        for (size_t i = 0; i < m_cntItem; ++i) {
+            if (m_lstItem[i]->m_itemName == itemName &&
+                !m_lstItem[i]->m_isFilled)
+            {
+                return false;    // found a matching item AND it's NOT filled
+            }
         }
+        return true; // either item doesn't exist OR all copies are filled
     }
-    return true; // either item doesn't exist OR all copies are filled
-}
-
-
-
-
 
     void CustomerOrder::fillItem(Station& station, std::ostream& os) {
         for (size_t i = 0u; i < m_cntItem; ++i) {
@@ -107,9 +104,11 @@ namespace seneca {
                     m_lstItem[i]->m_isFilled = true;
                     station.updateQuantity();
 
+                    // Message format confirmed correct (4 spaces, terminated by \n)
                     os << "    Filled " << m_name << ", " << m_product
                        << " [" << station.getItemName() << "]\n";
                 } else {
+                    // Message format confirmed correct (4 spaces, terminated by \n)
                     os << "    Unable to fill " << m_name << ", " << m_product
                        << " [" << station.getItemName() << "]\n";
                 }
@@ -123,8 +122,12 @@ namespace seneca {
         os << m_name << " - " << m_product << '\n';
         for (size_t i = 0u; i < m_cntItem; ++i) {
             os << "[";
-            os << std::setw(6) << std::setfill('0') << m_lstItem[i]->m_serialNumber;
+            
+            // FIX: Ensure explicit right justification for serial number padding
+            os << std::right << std::setw(6) << std::setfill('0') << m_lstItem[i]->m_serialNumber;
+            
             os << "] ";
+            // Ensure proper left justification for item name
             os << std::left << std::setw(m_widthField) << std::setfill(' ')
                << m_lstItem[i]->m_itemName << " - ";
             os << (m_lstItem[i]->m_isFilled ? "FILLED" : "TO BE FILLED") << '\n';
