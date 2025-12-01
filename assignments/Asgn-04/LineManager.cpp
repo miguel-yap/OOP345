@@ -13,13 +13,10 @@ namespace seneca {
 
     Utilities util;
     std::string line;
-    bool more;
-    size_t pos;
+    bool more = false;
+    size_t pos = 0u;
 
     std::vector<Workstation*> nextStations;
-
-    // Do NOT push into m_activeLine here
-    // m_activeLine stays empty during file parsing
 
     while (std::getline(in, line)) {
         if (line.empty()) continue;
@@ -35,20 +32,22 @@ namespace seneca {
 
         Workstation* currentWS = *curIt;
 
+        // The config file order must be preserved:
+        // ALWAYS push the currentWS in m_activeLine
+        m_activeLine.push_back(currentWS);
+
         if (!nextName.empty()) {
             auto nextIt = std::find_if(stations.begin(), stations.end(),
                 [&](Workstation* ws){ return ws->getItemName() == nextName; });
 
             Workstation* nextWS = *nextIt;
             currentWS->setNextStation(nextWS);
+
             nextStations.push_back(nextWS);
         }
-
-        // PROBLEM LINE REMOVED ⛔
-        // m_activeLine.push_back(currentWS);
     }
 
-    // find first station: the one that is not in nextStations
+    // find the first station = the one never listed as 'next'
     for (auto* ws : stations) {
         if (std::find(nextStations.begin(), nextStations.end(), ws) == nextStations.end()) {
             m_firstStation = ws;
@@ -56,10 +55,12 @@ namespace seneca {
         }
     }
 
-    // Build the active line in correct order
+    // reorder into correct chain order
     reorderStations();
+
     m_cntCustomerOrder = g_pending.size();
 }
+
 
 
     void LineManager::reorderStations() {
