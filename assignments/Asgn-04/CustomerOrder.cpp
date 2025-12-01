@@ -108,27 +108,24 @@ namespace seneca {
     }
 
     void CustomerOrder::fillItem(Station& station, std::ostream& os) {
+    bool itemFound = false; // REMOVE THIS LINE
 
-        // Iterate through items to find the first matching, unfilled item
-        for (size_t i = 0; i < m_cntItem; ++i) {
-            if (m_lstItem[i]->m_itemName == station.getItemName() && !m_lstItem[i]->m_isFilled) {
-                itemFound = true;
-                if (station.getQuantity() > 0) {
-                    // Fill the order
-                    station.updateQuantity();
-                    m_lstItem[i]->m_serialNumber = station.getNextSerialNumber();
-                    m_lstItem[i]->m_isFilled = true;
-                    
-                    os << "    Filled " << m_name << ", " << m_product << " [" << m_lstItem[i]->m_itemName << "]" << std::endl;
-                    break; // Fill one item and exit
-                } else {
-                    // Inventory is empty
-                    os << "    Unable to fill " << m_name << ", " << m_product << " [" << m_lstItem[i]->m_itemName << "]" << std::endl;
-                    break; // Print message and exit (only one fill per item per station is expected in one step)
-                }
+    // Iterate through items to find the first matching, unfilled item
+    for (size_t i = 0; i < m_cntItem; ++i) {
+        if (m_lstItem[i]->m_itemName == station.getItemName() && !m_lstItem[i]->m_isFilled) {
+            // itemFound = true; // REMOVE OR COMMENT OUT THIS LINE
+            if (station.getQuantity() > 0) {
+                // Fill the order
+                // ... (rest of the filling logic) ...
+                break; // Fill one item and exit
+            } else {
+                // Inventory is empty
+                // ... (print unable to fill message) ...
+                break; // Print message and exit
             }
         }
     }
+}
 
     void CustomerOrder::display(std::ostream& os) const {
         os << m_name << " - " << m_product << std::endl;
