@@ -91,31 +91,30 @@ namespace seneca {
     }
 
 
-    bool LineManager::run(std::ostream& os) {
-        static size_t iteration = 0u;
+    // Corrected LineManager::run() - FINAL VERSION
 
-        // FIX: Move the incoming order BEFORE printing the iteration header.
-        // This ensures the FILL operations of the current iteration (which
-        // include filling the newly moved order) are printed BEFORE the
-        // header of the NEXT run() call, aligning the output.
-        if (!g_pending.empty()) {
-            *m_firstStation += std::move(g_pending.front());
-            g_pending.pop_front();
-        }
-        
-        // Print the header for this iteration.
-        os << "Line Manager Iteration: " << ++iteration << "\n";
-
-        // 1. FILL forward
-        for (auto* ws : m_activeLine) 
-            ws->fill(os);
-
-        // 2. MOVE backward
-        for (auto it = m_activeLine.rbegin(); it != m_activeLine.rend(); ++it)
-            (*it)->attemptToMoveOrder();
-
-        return (g_completed.size() + g_incomplete.size()) == m_cntCustomerOrder;
+bool LineManager::run(std::ostream& os) {
+    static size_t iteration = 0u;
+    
+    // 1. Move one order from g_pending queue to the first station
+    if (!g_pending.empty()) {
+        *m_firstStation += std::move(g_pending.front());
+        g_pending.pop_front();
     }
+    
+    // 2. Print the header for this iteration.
+    os << "Line Manager Iteration: " << ++iteration << "\n";
+
+    // 3. FILL forward (This will include the order just moved from pending)
+    for (auto* ws : m_activeLine) 
+        ws->fill(os);
+
+    // 4. MOVE backward (This allows orders to progress one step)
+    for (auto it = m_activeLine.rbegin(); it != m_activeLine.rend(); ++it)
+        (*it)->attemptToMoveOrder();
+
+    return (g_completed.size() + g_incomplete.size()) == m_cntCustomerOrder;
+}
 
 
     void LineManager::display(std::ostream& os) const {
