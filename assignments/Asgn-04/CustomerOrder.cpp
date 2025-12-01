@@ -10,29 +10,29 @@ namespace seneca {
     size_t CustomerOrder::m_widthField = 0u;
 
     CustomerOrder::CustomerOrder(const std::string& record) {
-        Utilities util;
-        bool more = true;
-        size_t pos = 0u;
+    Utilities util;
+    bool more = true;
+    size_t pos = 0u;
 
-        m_name = util.extractToken(record, pos, more);
-        if (more)
-            m_product = util.extractToken(record, pos, more);
+    m_name = util.extractToken(record, pos, more);
+    m_product = util.extractToken(record, pos, more);
 
-        std::vector<std::string> items;
-        while (more) {
-            items.push_back(util.extractToken(record, pos, more));
-        }
+    std::vector<std::string> items;
 
-        m_cntItem = items.size();
-        m_lstItem = new Item*[m_cntItem];
-        for (size_t i = 0u; i < m_cntItem; ++i) {
-            m_lstItem[i] = new Item(items[i]);
-        }
-
-        if (util.getFieldWidth() > m_widthField) {
-            m_widthField = util.getFieldWidth();
-        }
+    while (more) {
+        items.push_back(util.extractToken(record, pos, more));
     }
+
+    m_cntItem = items.size();
+    m_lstItem = new Item*[m_cntItem];
+
+    for (size_t i = 0; i < m_cntItem; ++i)
+        m_lstItem[i] = new Item(items[i]);
+
+    if (util.getFieldWidth() > m_widthField)
+        m_widthField = util.getFieldWidth();
+}
+
 
     // copy constructor must throw (as per spec / tester)
     CustomerOrder::CustomerOrder(const CustomerOrder& other) {
