@@ -6,6 +6,7 @@
 #include <sstream>
 #include "LineManager.h"
 #include "Utilities.h"
+#include "Workstation.h" // Ensure Workstation.h is included for the deque declarations
 
 namespace seneca {
     LineManager::LineManager(const std::string& file, const std::vector<Workstation*>& stations) {
@@ -16,10 +17,11 @@ namespace seneca {
 
         Utilities util;
         std::string record;
-        std::vector<Workstation*> line_parts; // Holds stations in file order
+        // Use temporary vectors to help determine the start station and links
+        std::vector<std::string> current_station_names;
         std::vector<std::string> next_station_names;
 
-        // --- 1. Load linkage and populate line_parts ---
+        // --- 1. Load linkage file and determine order/link names ---
         while (std::getline(f, record)) {
             if (record.empty()) continue;
 
@@ -29,15 +31,9 @@ namespace seneca {
             std::string next_station_name;
 
             try {
-                // WORKSTATION
+                // WORKSTATION (Current Station Name)
                 current_station_name = util.extractToken(record, next_pos, more);
-
-                // Find the current station object
-                auto current_it = std::find_if(stations.begin(), stations.end(), 
-                                               [&](Workstation* ws) { return ws->getItemName() == current_station_name; });
-                if (current_it != stations.end()) {
-                    line_parts.push_back(*current_it);
-                }
+                current_station_names.push_back(current_station_name);
 
                 // NEXT_WORKSTATION (optional)
                 if (more) {
@@ -46,36 +42,59 @@ namespace seneca {
                 } else {
                     next_station_names.push_back(""); // No next station
                 }
-            } catch (const std::string& msg) {
-                // Ignore records that cannot be parsed fully (e.g., if a next station isn't specified)
+            } catch (...) {
+                // Ignore records that cannot be parsed fully
             }
         }
         f.close();
 
-        // --- 2. Link stations ---
-        for (size_t i = 0; i < line_parts.size(); ++i) {
+        // --- 2. Populate m_activeLine in file order and set linkages ---
+        
+        // m_activeLine stores the stations in the order read from the file.
+        // This fixes the "Display Stations (loaded)" mismatch.
+        for (const auto& name : current_station_names) {
+            auto it = std::find_if(stations.begin(), stations.end(),
+                                   [&](Workstation* ws) { return ws->getItemName() == name; });
+            if (it != stations.end()) {
+                m_activeLine.push_back(*it);
+            }
+        }
+
+        // Now set the linkages using the names read earlier
+        for (size_t i = 0; i < current_station_names.size(); ++i) {
             if (!next_station_names[i].empty()) {
-                auto next_it = std::find_if(stations.begin(), stations.end(), 
+                
+                // Find the current station object from the full list
+                auto current_ws_it = std::find_if(stations.begin(), stations.end(), 
+                                               [&](Workstation* ws) { return ws->getItemName() == current_station_names[i]; });
+                
+                // Find the next station object from the full list
+                auto next_ws_it = std::find_if(stations.begin(), stations.end(), 
                                             [&](Workstation* ws) { return ws->getItemName() == next_station_names[i]; });
-                if (next_it != stations.end()) {
-                    line_parts[i]->setNextStation(*next_it);
+                
+                if (current_ws_it != stations.end() && next_ws_it != stations.end()) {
+                    (*current_ws_it)->setNextStation(*next_ws_it);
                 }
             }
         }
 
-        // --- 3. Identify the first station ---
-        // Stations that are pointed to by *any* other station are not the first station.
-        std::vector<Workstation*> next_stations;
-        for (Workstation* ws : stations) {
-            Workstation* next = ws->getNextStation();
-            if (next) {
-                next_stations.push_back(next);
-            }
-        }
+
+        // --- 3. Identify the first station (The station that is NOT a 'next' station) ---
         
-        // Find the station that is NOT in the list of next_stations
+        // Get all stations that are pointed to (i.e., every station except the first)
+        std::vector<Workstation*> next_stations;
+        std::for_each(stations.begin(), stations.end(), 
+                      [&](Workstation* ws) { 
+                          Workstation* next = ws->getNextStation();
+                          if (next) {
+                              next_stations.push_back(next);
+                          }
+                      });
+        
+        // Find the station that is not present in the 'next_stations' list.
         auto first_it = std::find_if(stations.begin(), stations.end(), 
                                      [&](Workstation* ws) {
+                                         // If the station is not found in the 'next_stations' list, it's the start.
                                          return std::find(next_stations.begin(), next_stations.end(), ws) == next_stations.end();
                                      });
 
@@ -83,10 +102,7 @@ namespace seneca {
             m_firstStation = *first_it;
         }
 
-        // Initialize m_activeLine with all stations (will be reordered later)
-        m_activeLine = stations; 
-
-        // --- 4. Update order count ---
+        // --- 4. Update total order count ---
         m_cntCustomerOrder = g_pending.size();
     }
 
@@ -102,7 +118,7 @@ namespace seneca {
             current = current->getNextStation();
         }
 
-        // Overwrite the member variable
+        // Overwrite the member variable with the ordered collection
         m_activeLine = reordered_line;
     }
 
@@ -114,7 +130,6 @@ namespace seneca {
 
         // 1. Move the order from g_pending to the first station
         if (!g_pending.empty()) {
-            // Use operator+= to move the order
             *m_firstStation += std::move(g_pending.front());
             g_pending.pop_front();
         }
