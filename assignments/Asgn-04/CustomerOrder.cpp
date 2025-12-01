@@ -108,7 +108,6 @@ namespace seneca {
     }
 
     void CustomerOrder::fillItem(Station& station, std::ostream& os) {
-        bool itemFound = false;
 
         // Iterate through items to find the first matching, unfilled item
         for (size_t i = 0; i < m_cntItem; ++i) {
