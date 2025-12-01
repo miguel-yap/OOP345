@@ -47,19 +47,18 @@ namespace seneca {
         }
     }
 
-    // find the first station = the one never listed as 'next'
-    for (auto* ws : stations) {
-        if (std::find(nextStations.begin(), nextStations.end(), ws) == nextStations.end()) {
-            m_firstStation = ws;
-            break;
-        }
+    // find first station: the one that is not in nextStations
+for (auto* ws : stations) {
+    if (std::find(nextStations.begin(), nextStations.end(), ws) == nextStations.end()) {
+        m_firstStation = ws;
+        break;
     }
-
-    // reorder into correct chain order
-    reorderStations();
-
-    m_cntCustomerOrder = g_pending.size();
 }
+
+// Do NOT reorder here – tester_3 calls reorderStations() explicitly later
+m_cntCustomerOrder = g_pending.size();
+}
+
 
 
 
