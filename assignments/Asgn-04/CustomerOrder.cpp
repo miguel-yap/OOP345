@@ -87,12 +87,12 @@ namespace seneca {
         if (m_lstItem[i]->m_itemName == itemName &&
             !m_lstItem[i]->m_isFilled)
         {
-            return false;   // exists AND unfilled -> false
+            return false;    // found a matching item AND it's NOT filled
         }
     }
-
-    return true;            // either no such items, or all filled
+    return true; // either item doesn't exist OR all copies are filled
 }
+
 
 
 
