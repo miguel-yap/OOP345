@@ -20,12 +20,22 @@ namespace seneca {
     if (m_orders.empty())
         return false;
 
-    // Reference to the front order
-    auto& order = m_orders.front();
+    CustomerOrder& order = m_orders.front();
 
-    // If this station's item is filled OR station cannot fill it
-    if (order.isItemFilled(getItemName()) || getQuantity() == 0) {
+    // Does this workstation's item still need to be filled?
+    bool needsThisItem = false;
+    for (size_t i = 0; i < order.m_cntItem; ++i) {
+        if (order.m_lstItem[i]->m_itemName == getItemName() &&
+            !order.m_lstItem[i]->m_isFilled) {
+            needsThisItem = true;
+            break;
+        }
+    }
 
+    // Move conditions:
+    // 1) order does NOT need this item anymore (fill() solved it)
+    // 2) OR station CANNOT fill (quantity == 0)
+    if (!needsThisItem || getQuantity() == 0) {
         if (m_pNextStation) {
             *m_pNextStation += std::move(order);
         } else {
@@ -41,6 +51,7 @@ namespace seneca {
 
     return false;
 }
+
 
 
     void Workstation::setNextStation(Workstation* station) {
