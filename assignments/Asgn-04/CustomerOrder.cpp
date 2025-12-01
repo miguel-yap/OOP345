@@ -83,13 +83,17 @@ namespace seneca {
     }
 
     bool CustomerOrder::isItemFilled(const std::string& itemName) const {
-    for (size_t i = 0u; i < m_cntItem; ++i) {
-        if (m_lstItem[i]->m_itemName == itemName &&
-            !m_lstItem[i]->m_isFilled) {
-            return false;
+    bool found = false;
+
+    for (size_t i = 0; i < m_cntItem; ++i) {
+        if (m_lstItem[i]->m_itemName == itemName) {
+            found = true;
+            if (!m_lstItem[i]->m_isFilled)
+                return false;       // exists AND at least one unfilled → false
         }
     }
-    return true;    // either no such item, or all matching ones are filled
+
+    return true;                    // either no such item, or all were filled
 }
 
 
