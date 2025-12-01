@@ -1,73 +1,78 @@
-
-
+#include <iostream>
+#include <iomanip>
 #include "Workstation.h"
+#include "CustomerOrder.h"
 
-using namespace sdds;
-using namespace std;
+namespace seneca {
+    // Define global queues
+    std::deque<CustomerOrder> g_pending;
+    std::deque<CustomerOrder> g_completed;
+    std::deque<CustomerOrder> g_incomplete;
 
-deque<CustomerOrder> g_pending{};
-deque<CustomerOrder> g_completed{};
-deque<CustomerOrder> g_incomplete{};
+    Workstation::Workstation(const std::string& record) : Station(record) {}
 
-Workstation::Workstation(const string& data) : Station{ data } {}
-
-void Workstation::fill(ostream& os) {
-    if (!m_orders.empty()) {
-        m_orders.front().fillItem(*this, os);
+    void Workstation::fill(std::ostream& os) {
+        if (!m_orders.empty()) {
+            // Fills one item in the order at the front of the queue
+            m_orders.front().fillItem(*this, os);
+        }
     }
-}
 
-bool Workstation::attemptToMoveOrder() {
-    if (m_orders.empty()) {
-        return true;
-    }
-    else {
-        if (m_orders.front().isItemFilled(getItemName()) || this->getQuantity() == 0) {
-            if (m_pNextStation == nullptr) {
-                if (m_orders.front().isOrderFilled()) {
-                    g_completed.emplace_back(move(m_orders.front()));
-                }
-                else {
-                    g_incomplete.emplace_back(move(m_orders.front()));
+    bool Workstation::attemptToMoveOrder() {
+        if (m_orders.empty()) {
+            return false;
+        }
+
+        // Get the order at the front
+        CustomerOrder& currentOrder = m_orders.front();
+        bool filledAtThisStation = currentOrder.isItemFilled(getItemName());
+        bool orderFilled = currentOrder.isOrderFilled();
+
+        // Condition 1: Order is fully filled, OR
+        // Condition 2: Order cannot be filled (not enough inventory at this station), OR
+        // Condition 3: The item is completely filled at this station.
+        if (orderFilled || getQuantity() == 0 || filledAtThisStation) {
+            
+            if (m_pNextStation) {
+                // Move to the next workstation
+                *m_pNextStation += std::move(currentOrder);
+            } else {
+                // End of the line
+                if (orderFilled) {
+                    g_completed.push_back(std::move(currentOrder));
+                } else {
+                    g_incomplete.push_back(std::move(currentOrder));
                 }
             }
-            else {
-                (*m_pNextStation) += move(m_orders.front());
-            }
+            
+            // Remove the order from the current queue
             m_orders.pop_front();
             return true;
         }
+
         return false;
     }
-}
 
-void Workstation::setNextStation(Workstation* station) {
-    m_pNextStation = station;
-}
-
-Workstation* Workstation::getNextStation() const {
-    return m_pNextStation;
-}
-
-void Workstation::display(ostream& os) const {
-    os << getItemName();
-    os << " --> ";
-
-    if (m_pNextStation == nullptr) {
-        os << "End of Line";
-    }
-    else {
-        os << m_pNextStation->getItemName();
+    void Workstation::setNextStation(Workstation* station) {
+        m_pNextStation = station;
     }
 
-    os << endl;
-}
+    Workstation* Workstation::getNextStation() const {
+        return m_pNextStation;
+    }
 
-Workstation& Workstation::operator+=(CustomerOrder&& new_Order) {
-    m_orders.emplace_back(move(new_Order));
-    return *this;
-}
+    void Workstation::display(std::ostream& os) const {
+        os << getItemName() << " --> ";
+        if (m_pNextStation) {
+            os << m_pNextStation->getItemName();
+        } else {
+            os << "End of Line";
+        }
+        os << std::endl;
+    }
 
-bool Workstation::empty() const {
-    return m_orders.empty();
+    Workstation& Workstation::operator+=(CustomerOrder&& newOrder) {
+        m_orders.push_back(std::move(newOrder));
+        return *this;
+    }
 }

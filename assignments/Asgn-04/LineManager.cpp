@@ -1,141 +1,138 @@
 #include <iostream>
 #include <fstream>
-#include <algorithm>
+#include <string>
 #include <vector>
-#include <set> // Required for tracking next stations for m_first_Station logic
+#include <algorithm>
+#include <sstream>
 #include "LineManager.h"
 #include "Utilities.h"
-#include "Workstation.h" // Ensures Workstation details are visible
 
-using namespace sdds;
-using namespace std;
-
-// Implementation of Workstation::empty is needed to use it in LineManager::run
-bool sdds::Workstation::empty() const {
-    return m_orders.empty();
-}
-
-
-LineManager::LineManager(const string& file, const vector<Workstation*>& stations) {
-	Utilities utility;
-
-	ifstream input(file);
-	if (!input.is_open()) {
-		throw string("Unable to open file.");
-	}
-
-    std::set<Workstation*> nextStations; // Tracks all workstations that appear as a 'next' station
-    std::vector<Workstation*> addedToActiveLine; // Tracks workstations already added to maintain file order and uniqueness
-
-	string data;
-	while (getline(input, data))
-	{
-        if (data.empty()) continue;
-
-		size_t pos = 0;
-		bool more = true;
-		string curStation, nextStation;
-		curStation = utility.extractToken(data, pos, more);
-
-		if (more) {
-			nextStation = utility.extractToken(data, pos, more);
-		}
-
-		Workstation* curWorkstation = nullptr;
-		Workstation* nextWorkstation = nullptr;
-        
-        // Use find_if with a lambda to efficiently search the stations vector
-        auto find_ws = [&](const string& name) {
-            return std::find_if(stations.begin(), stations.end(), [&](Workstation* ws) {
-                return ws->getItemName() == name;
-            });
-        };
-
-        auto it_cur = find_ws(curStation);
-        if (it_cur != stations.end()) {
-            curWorkstation = *it_cur;
+namespace seneca {
+    LineManager::LineManager(const std::string& file, const std::vector<Workstation*>& stations) {
+        std::ifstream f(file);
+        if (!f) {
+            throw std::string("Unable to open [") + file + "] file.";
         }
 
-        if (!nextStation.empty()) {
-            auto it_next = find_ws(nextStation);
-            if (it_next != stations.end()) {
-                nextWorkstation = *it_next;
-                nextStations.insert(nextWorkstation); // Record this as a 'next' station
+        Utilities util;
+        std::string record;
+        std::vector<Workstation*> line_parts; // Holds stations in file order
+        std::vector<std::string> next_station_names;
+
+        // --- 1. Load linkage and populate line_parts ---
+        while (std::getline(f, record)) {
+            if (record.empty()) continue;
+
+            size_t next_pos = 0;
+            bool more = true;
+            std::string current_station_name;
+            std::string next_station_name;
+
+            try {
+                // WORKSTATION
+                current_station_name = util.extractToken(record, next_pos, more);
+
+                // Find the current station object
+                auto current_it = std::find_if(stations.begin(), stations.end(), 
+                                               [&](Workstation* ws) { return ws->getItemName() == current_station_name; });
+                if (current_it != stations.end()) {
+                    line_parts.push_back(*current_it);
+                }
+
+                // NEXT_WORKSTATION (optional)
+                if (more) {
+                    next_station_name = util.extractToken(record, next_pos, more);
+                    next_station_names.push_back(next_station_name);
+                } else {
+                    next_station_names.push_back(""); // No next station
+                }
+            } catch (const std::string& msg) {
+                // Ignore records that cannot be parsed fully (e.g., if a next station isn't specified)
+            }
+        }
+        f.close();
+
+        // --- 2. Link stations ---
+        for (size_t i = 0; i < line_parts.size(); ++i) {
+            if (!next_station_names[i].empty()) {
+                auto next_it = std::find_if(stations.begin(), stations.end(), 
+                                            [&](Workstation* ws) { return ws->getItemName() == next_station_names[i]; });
+                if (next_it != stations.end()) {
+                    line_parts[i]->setNextStation(*next_it);
+                }
+            }
+        }
+
+        // --- 3. Identify the first station ---
+        // Stations that are pointed to by *any* other station are not the first station.
+        std::vector<Workstation*> next_stations;
+        for (Workstation* ws : stations) {
+            Workstation* next = ws->getNextStation();
+            if (next) {
+                next_stations.push_back(next);
             }
         }
         
-        // If curWorkstation was not found, there is a fundamental error (though unlikely given tester structure)
+        // Find the station that is NOT in the list of next_stations
+        auto first_it = std::find_if(stations.begin(), stations.end(), 
+                                     [&](Workstation* ws) {
+                                         return std::find(next_stations.begin(), next_stations.end(), ws) == next_stations.end();
+                                     });
 
-		curWorkstation->setNextStation(nextWorkstation);
-        
-        // FIX 1: Add curWorkstation to m_active_Line only if it hasn't been added yet (maintain uniqueness and file order)
-        if (std::find(addedToActiveLine.begin(), addedToActiveLine.end(), curWorkstation) == addedToActiveLine.end()) {
-            m_active_Line.push_back(curWorkstation);
-            addedToActiveLine.push_back(curWorkstation);
+        if (first_it != stations.end()) {
+            m_firstStation = *first_it;
         }
-	}
 
-	input.close();
-    
-    // Determine m_first_Station: the station that never appears in the 'nextStations' set
-    m_first_Station = nullptr;
-    for (Workstation* ws : stations) {
-        // Must be part of the line configuration AND not appear as a next station
-        if (std::find(m_active_Line.begin(), m_active_Line.end(), ws) != m_active_Line.end() &&
-            nextStations.find(ws) == nextStations.end()) 
-        {
-            m_first_Station = ws;
-            break;
-        }
+        // Initialize m_activeLine with all stations (will be reordered later)
+        m_activeLine = stations; 
+
+        // --- 4. Update order count ---
+        m_cntCustomerOrder = g_pending.size();
     }
-    
-    // Store the total number of orders in the pending queue at startup
-    m_cntCustomer_Order = g_pending.size();
-}
 
-void LineManager::reorderStations() {
-	vector<Workstation*> newStations;
-	Workstation* currStation = m_first_Station;
-	
-	while (currStation != nullptr) {
-		newStations.push_back(currStation);
-		currStation = currStation->getNextStation();
-	}
-    
-    // Replace the active line with the correctly ordered line
-	m_active_Line = std::move(newStations);
-}
+    void LineManager::reorderStations() {
+        if (!m_firstStation) return;
 
-bool LineManager::run(ostream& os) {
-	static int count = 0;
-	
-    // FIX 2: Move the incoming order BEFORE printing the iteration header.
-    // This aligns the line count where the fills of the newly moved order appear.
-	if (!g_pending.empty()) {
-		(*m_first_Station) += move(g_pending.front());
-		g_pending.pop_front();
-	}
+        std::vector<Workstation*> reordered_line;
+        Workstation* current = m_firstStation;
 
-    // Print the header for this iteration.
-	count++;
-	os << "Line Manager Iteration: " << count << endl;
+        // Traverse the line from the first station to the end
+        while (current) {
+            reordered_line.push_back(current);
+            current = current->getNextStation();
+        }
 
-    // 1. FILL forward
-	for (unsigned int i = 0; i < m_active_Line.size(); i++) {
-		m_active_Line[i]->fill(os);
-	}
+        // Overwrite the member variable
+        m_activeLine = reordered_line;
+    }
 
-    // 2. MOVE backward (using fixed reverse loop)
-	for (int i = m_active_Line.size() - 1; i >= 0; i--) { 
-		m_active_Line[i]->attemptToMoveOrder();
-	}
+    bool LineManager::run(std::ostream& os) {
+        static size_t iteration_count = 0;
+        iteration_count++;
 
-    // Check if all initial orders have been moved to g_completed or g_incomplete
-	return (g_completed.size() + g_incomplete.size()) == m_cntCustomer_Order;
-}
+        os << "Line Manager Iteration: " << iteration_count << std::endl;
 
-void LineManager::display(ostream& os) const {
-	for (unsigned int i = 0; i < m_active_Line.size(); i++) {
-		m_active_Line[i]->display(os);
-	}
+        // 1. Move the order from g_pending to the first station
+        if (!g_pending.empty()) {
+            // Use operator+= to move the order
+            *m_firstStation += std::move(g_pending.front());
+            g_pending.pop_front();
+        }
+
+        // 2. Execute one fill operation for each station
+        std::for_each(m_activeLine.begin(), m_activeLine.end(), 
+                      [&os](Workstation* ws) { ws->fill(os); });
+
+        // 3. Attempt to move an order down the line for each station
+        std::for_each(m_activeLine.begin(), m_activeLine.end(), 
+                      [](Workstation* ws) { ws->attemptToMoveOrder(); });
+
+        // 4. Return true if all orders are processed
+        return m_cntCustomerOrder == (g_completed.size() + g_incomplete.size());
+    }
+
+    void LineManager::display(std::ostream& os) const {
+        std::for_each(m_activeLine.begin(), m_activeLine.end(), 
+                      [&os](Workstation* ws) { ws->display(os); });
+    }
 }

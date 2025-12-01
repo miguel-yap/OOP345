@@ -1,31 +1,28 @@
-#ifndef SDDS_STATION_H
-#define SDDS_STATION_H
+#ifndef SENECA_STATION_H
+#define SENECA_STATION_H
 
+#include <iostream>
 #include <string>
 
-using namespace std;
-
-// Changed namespace sdds to seneca
 namespace seneca {
     class Station {
-        int id;
-        string name;
-        string desc;
-        unsigned int nextSerialNo;
-        unsigned int noItems;
+        size_t m_id;
+        std::string m_itemName;
+        std::string m_description;
+        size_t m_serialNumber;
+        size_t m_stockQuantity;
 
-        static size_t m_widthField;
-        static int id_generator;
+        static size_t m_widthField; // Max width of item names
+        static size_t id_generator; // Generates unique IDs
 
     public:
-        Station(const string& record);
-        const string& getItemName() const;
+        Station(const std::string& record);
+        const std::string& getItemName() const;
         size_t getNextSerialNumber();
         size_t getQuantity() const;
         void updateQuantity();
-        void display(ostream& os, bool full) const;
+        void display(std::ostream& os, bool full) const;
     };
-};
+}
 
-
-#endif
+#endif // SENECA_STATION_H

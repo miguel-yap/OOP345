@@ -1,68 +1,73 @@
-
-
-
 #include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <iomanip>
 #include "Utilities.h"
 
-char sdds::Utilities::m_delimiter = '|';
+namespace seneca {
+    // Initialize the static member
+    char Utilities::m_delimiter = ',';
 
-void sdds::Utilities::setFieldWidth(size_t new_Width) {
-    m_widthField = new_Width;
-}
-
-size_t sdds::Utilities::getFieldWidth() const {
-    return m_widthField;
-}
-
-string sdds::Utilities::extractToken(const string& str, size_t& next_pos, bool& more) {
-
-    if (str[next_pos] == m_delimiter || next_pos >= str.length()) {
-        more = false;
-        throw invalid_argument("Invalid next_pos arguement");
+    void Utilities::setFieldWidth(size_t newWidth) {
+        m_widthField = newWidth;
     }
 
-    string token = "";
-    string whitespace = "";
-
-    while (next_pos < (size_t)str.length()) {
-        if (str[next_pos] != ' ') {
-            if (str[next_pos] == '\n' || str[next_pos] == '\r') {
-                break;
-            }
-            else if (str[next_pos] == m_delimiter) {
-                if (m_widthField < token.length()) {
-                    m_widthField = token.length();
-                }
-                more = true;
-                next_pos++;
-                return token;
-            }
-            else {
-                if (token.length() > 0) {
-                    token += whitespace + str[next_pos];
-                    whitespace = "";
-                }
-                else {
-                    token += str[next_pos];
-                    whitespace = "";
-                }
-
-                if (next_pos == (size_t)str.length() - 1) {
-                    if (m_widthField < token.length()) {
-                        m_widthField = token.length();
-                    }
-                    more = false;
-                    next_pos++;
-                    return token;
-                }
-            }
-        }
-        else {
-            whitespace += ' ';
-        }
-        next_pos++;
+    size_t Utilities::getFieldWidth() const {
+        return m_widthField;
     }
 
-    more = false;
-    return token;
+    // Helper to trim leading/trailing whitespace
+    static std::string trim(const std::string& str) {
+        // Find first non-space character
+        const auto start = str.find_first_not_of(' ');
+        // If the string is all spaces or empty
+        if (start == std::string::npos) {
+            return "";
+        }
+        // Find last non-space character
+        const auto end = str.find_last_not_of(' ');
+        // Return the substring
+        return str.substr(start, end - start + 1);
+    }
+
+    std::string Utilities::extractToken(const std::string& str, size_t& next_pos, bool& more) {
+        std::string token;
+        size_t end_pos = str.find(m_delimiter, next_pos);
+
+        // Check if a delimiter is found at the current position (empty token)
+        if (next_pos == end_pos) {
+            more = false;
+            throw "Delimiter found at current position.";
+        }
+
+        if (end_pos == std::string::npos) {
+            // Last token on the line
+            token = str.substr(next_pos);
+            more = false;
+            next_pos = str.length();
+        } else {
+            // Token found
+            token = str.substr(next_pos, end_pos - next_pos);
+            next_pos = end_pos + 1; // Move past the delimiter
+            more = true;
+        }
+
+        // Trim the token
+        token = trim(token);
+
+        // Update m_widthField if the extracted token is longer
+        if (token.length() > m_widthField) {
+            m_widthField = token.length();
+        }
+
+        return token;
+    }
+
+    void Utilities::setDelimiter(char newDelimiter) {
+        m_delimiter = newDelimiter;
+    }
+
+    char Utilities::getDelimiter() {
+        return m_delimiter;
+    }
 }

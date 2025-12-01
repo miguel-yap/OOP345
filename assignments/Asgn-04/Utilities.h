@@ -1,28 +1,22 @@
-#ifndef SDDS_UTILITIES_H
-#define SDDS_UTILITIES_H
+#ifndef SENECA_UTILITIES_H
+#define SENECA_UTILITIES_H
 
 #include <string>
-#include <stdexcept>
+#include <iostream>
 
-using namespace std;
-
-// Changed namespace sdds to seneca
 namespace seneca {
     class Utilities {
-        size_t m_widthField = 1;
-        static char m_delimiter;
+        size_t m_widthField{1}; // Instance variable
+        static char m_delimiter; // Class variable
 
     public:
-        void setFieldWidth(size_t new_Width);
+        void setFieldWidth(size_t newWidth);
         size_t getFieldWidth() const;
-        string extractToken(const string& str, size_t& next_pos, bool& more);
-        static void setDelimiter(char new_Delimiter) {
-            m_delimiter = new_Delimiter;
-        }
-        static char getDelimiter() {
-            return m_delimiter;
-        }
-    };
-};
+        std::string extractToken(const std::string& str, size_t& next_pos, bool& more);
 
-#endif
+        static void setDelimiter(char newDelimiter);
+        static char getDelimiter();
+    };
+}
+
+#endif // SENECA_UTILITIES_H
