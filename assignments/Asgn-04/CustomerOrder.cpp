@@ -2,7 +2,8 @@
 #include <iostream>
 #include <iomanip>
 #include <utility>
-#include <string> // Added string for clarity
+#include <string>
+#include <vector> // <-- ADDED MISSING INCLUDE HERE
 #include "CustomerOrder.h"
 #include "Utilities.h"
 #include "Station.h" // Added Station.h to ensure Station class is visible
@@ -23,7 +24,6 @@ namespace sdds {
         size_t pos = 0;
         bool more = true;
 
-        // Use a local string for the record to ensure the original input isn't modified
         string tempInput = input; 
 
         // 1. Extract Customer Name
@@ -33,7 +33,7 @@ namespace sdds {
         m_item = utility.extractToken(tempInput, pos, more);
 
         // 3. Extract all remaining items
-        vector<string> items;
+        vector<string> items; // <-- This is where 'vector' was missing
         while (more) {
             string token = utility.extractToken(tempInput, pos, more);
             if (!token.empty()) {
@@ -114,7 +114,6 @@ namespace sdds {
                 }
             }
         }
-        // Returns true if all requested items of that name are filled, or if the item wasn't requested (itemCount == filledCount == 0)
         return itemCount == filledCount;
     }
 
@@ -129,21 +128,17 @@ namespace sdds {
                     m_lstItem[i]->m_isFilled = true;
                     station.updateQuantity();
                     
-                    // FIX 1: Use explicit four spaces for required indentation. Ditch setw/right.
+                    // FIX: Use explicit four spaces for required indentation.
                     os << "    Filled " << m_name << ", " << m_item 
                        << " [" << m_lstItem[i]->m_itemName << "]" << endl;
-                    break; // Fill only ONE item per fill call
+                    break; 
 
                 }
                 else {
 
-                    // FIX 1: Use explicit four spaces for required indentation.
+                    // FIX: Use explicit four spaces for required indentation.
                     os << "    Unable to fill " << m_name << ", " << m_item 
                        << " [" << m_lstItem[i]->m_itemName << "]" << endl;
-                    
-                    // Do NOT break here. You must check other items if the current one is out of stock.
-                    // Wait, specification says: "fills one item... if there is any such request."
-                    // If the first unfilled item cannot be filled, we report and stop for this station/order.
                     break; 
 
                 }
@@ -157,12 +152,12 @@ namespace sdds {
         for (size_t i = 0; i < m_cntItem; i++) {
             
             os << "[";
-            // FIX 2: Explicitly ensure right justification for padded serial number
+            // FIX: Explicitly ensure right justification for padded serial number
             os << std::right << setw(6) << setfill('0') << m_lstItem[i]->m_serialNumber; 
             os << "] ";
             
-            os << setfill(' ') << left;
-            os << setw(m_widthField + 2) << m_lstItem[i]->m_itemName << " - "; // Added +2 for width to match sample
+            os << std::left << setfill(' '); // Set left for the name field
+            os << setw(m_widthField + 2) << m_lstItem[i]->m_itemName << " - ";
             os << (m_lstItem[i]->m_isFilled ? "FILLED" : "TO BE FILLED");
             os << endl;
         }
