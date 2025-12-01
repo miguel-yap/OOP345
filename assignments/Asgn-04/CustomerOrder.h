@@ -1,5 +1,3 @@
-
-
 #ifndef SDDS_CUSTOMER_ORDER_H
 #define SDDS_CUSTOMER_ORDER_H
 
@@ -7,7 +5,8 @@
 
 using namespace std;
 
-namespace sdds {
+// Changed namespace sdds to seneca
+namespace seneca {
     struct Item
     {
         string m_itemName;

@@ -1,13 +1,12 @@
-
-
-#ifndef STATION_H
-#define STATION_H
+#ifndef SDDS_STATION_H
+#define SDDS_STATION_H
 
 #include <string>
 
 using namespace std;
 
-namespace sdds {
+// Changed namespace sdds to seneca
+namespace seneca {
     class Station {
         int id;
         string name;

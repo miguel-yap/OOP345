@@ -1,6 +1,3 @@
-
-
-
 #ifndef SDDS_WORKSTATION_H
 #define SDDS_WORKSTATION_H
 
@@ -11,11 +8,13 @@
 
 using namespace std;
 
-extern deque<sdds::CustomerOrder> g_pending;
-extern deque<sdds::CustomerOrder> g_completed;
-extern deque<sdds::CustomerOrder> g_incomplete;
+// Changed namespace sdds to seneca for the global deque declarations
+extern deque<seneca::CustomerOrder> g_pending;
+extern deque<seneca::CustomerOrder> g_completed;
+extern deque<seneca::CustomerOrder> g_incomplete;
 
-namespace sdds {
+// Changed namespace sdds to seneca
+namespace seneca {
 
     class Workstation : public Station {
         deque<CustomerOrder> m_orders;

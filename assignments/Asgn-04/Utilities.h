@@ -1,4 +1,3 @@
-
 #ifndef SDDS_UTILITIES_H
 #define SDDS_UTILITIES_H
 
@@ -7,7 +6,8 @@
 
 using namespace std;
 
-namespace sdds {
+// Changed namespace sdds to seneca
+namespace seneca {
     class Utilities {
         size_t m_widthField = 1;
         static char m_delimiter;

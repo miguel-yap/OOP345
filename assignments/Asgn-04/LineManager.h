@@ -1,5 +1,3 @@
-
-
 #ifndef SDDS_LINE_MANAGER_H
 #define SDDS_LINE_MANAGER_H
 
@@ -10,7 +8,8 @@
 
 using namespace std;
 
-namespace sdds {
+// Changed namespace sdds to seneca
+namespace seneca {
     class LineManager {
         vector<Workstation*> m_active_Line;
         size_t m_cntCustomer_Order;
