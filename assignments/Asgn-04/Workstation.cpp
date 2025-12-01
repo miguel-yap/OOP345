@@ -26,14 +26,15 @@ namespace seneca {
         CustomerOrder& currentOrder = m_orders.front();
         bool filledAtThisStation = currentOrder.isItemFilled(getItemName());
 
-        // Condition 1: Item is filled at this station, OR
-        // Condition 2: We are at the end of the line.
-        if (filledAtThisStation) {
-            // The item required by this station is fully filled for this order. Move it.
+        // An order MUST move if:
+        // 1. It is fully filled for the item at this station (filledAtThisStation == true), OR
+        // 2. The station is out of stock (getQuantity() == 0). This prevents the infinite loop.
+        if (filledAtThisStation || getQuantity() == 0) {
+            
             if (m_pNextStation) {
                 *m_pNextStation += std::move(currentOrder);
             } else {
-                // End of line. Check completion status.
+                // End of the line. Check completion status.
                 if (currentOrder.isOrderFilled()) {
                     g_completed.push_back(std::move(currentOrder));
                 } else {
@@ -43,14 +44,10 @@ namespace seneca {
             
             m_orders.pop_front();
             return true;
-        } else if (m_pNextStation == nullptr) {
-            // At the end of the line, and the item is NOT filled. Must move it to g_incomplete.
-            g_incomplete.push_back(std::move(currentOrder));
-            m_orders.pop_front();
-            return true;
         }
 
-        return false; // Order needs service and has a next station, so hold it.
+        // Otherwise, hold the order back (it still needs service and we still have stock).
+        return false; 
     }
 
     void Workstation::setNextStation(Workstation* station) {
