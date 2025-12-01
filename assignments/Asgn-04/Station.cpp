@@ -1,3 +1,17 @@
+/* Citation and Sources.... 
+Assignment 04
+Module: Station
+FileName: Station.cpp
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 30, 2025
+------------------------------------------------------------------
+- Line 27-59 was assisted with the help of ChatGPT.
+- Line 80-92 was assisted with the help of ChatGPT.
+------------------------------------------------------------------*/
+
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -5,31 +19,26 @@
 #include "Utilities.h"
 
 namespace seneca {
-    // Initialize the static members
     size_t Station::m_widthField = 0;
-    size_t Station::id_generator = 1; // Starts at 1
+    size_t Station::id_generator = 1;
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     Station::Station(const std::string& record) {
         Utilities util;
         size_t next_pos = 0;
         bool more = true;
 
-        // 1. Assign unique ID and increment generator
         m_id = id_generator++;
 
-        // 2. Extract Item Name
         m_itemName = util.extractToken(record, next_pos, more);
 
-        // 3. Extract Starting Serial Number
         std::string serialStr = util.extractToken(record, next_pos, more);
         try {
             m_serialNumber = std::stoul(serialStr);
         } catch (...) {
-            // Handle error if conversion fails (though unlikely with valid data)
             m_serialNumber = 0;
         }
 
-        // 4. Extract Quantity in Stock
         std::string qtyStr = util.extractToken(record, next_pos, more);
         try {
             m_stockQuantity = std::stoul(qtyStr);
@@ -37,12 +46,10 @@ namespace seneca {
             m_stockQuantity = 0;
         }
 
-        // 5. Update m_widthField
         if (util.getFieldWidth() > m_widthField) {
             m_widthField = util.getFieldWidth();
         }
 
-        // 6. Extract Description (remaining part of the string)
         if (more) {
             m_description = util.extractToken(record, next_pos, more);
         } else {
@@ -68,6 +75,7 @@ namespace seneca {
         }
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     void Station::display(std::ostream& os, bool full) const {
         os << std::right << std::setw(3) << std::setfill('0') << m_id << " | ";
         os << std::left << std::setw(m_widthField) << std::setfill(' ') << m_itemName << " | ";

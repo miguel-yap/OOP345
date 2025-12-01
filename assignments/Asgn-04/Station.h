@@ -1,3 +1,16 @@
+/* Citation and Sources.... 
+Assignment 04
+Module: Station
+FileName: Station.h
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 30, 2025
+------------------------------------------------------------------
+I declare that this submission is the result of my own work and I only copied the code that my professor provided to complete my assignments. 
+This submitted piece of work has not been shared with any other student or 3rd party content provider.
+------------------------------------------------------------------*/
 #ifndef SENECA_STATION_H
 #define SENECA_STATION_H
 
@@ -12,8 +25,8 @@ namespace seneca {
         size_t m_serialNumber;
         size_t m_stockQuantity;
 
-        static size_t m_widthField; // Max width of item names
-        static size_t id_generator; // Generates unique IDs
+        static size_t m_widthField; 
+        static size_t id_generator; 
 
     public:
         Station(const std::string& record);

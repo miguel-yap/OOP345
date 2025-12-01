@@ -1,0 +1,19 @@
+/* Citation and Sources.... 
+Assignment 04
+Module: reflect
+FileName: reflect.txt
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 30, 2025
+------------------------------------------------------------------
+I declare that this submission is the result of my own work and I only copied the code that my professor provided to complete my assignments. 
+This submitted piece of work has not been shared with any other student or 3rd party content provider.
+------------------------------------------------------------------*/
+
+My reflection on this project is pretty simple: it was tough in a way that felt very real. This wasn’t just another class exercise so I had a lot of help from AI. The first big hurdle was handling the CustomerOrder objects. Moving them around without accidentally deleting something or leaving behind bad pointers was harder than I expected. Every “move” had to be handled carefully.
+
+The next challenge was untangling how the assembly line worked. Getting the LineManager and the Workstations to pass orders correctly felt like solving a puzzle where the pieces kept shifting. When an order got stuck because a station ran out of stock, the whole program would loop forever. The test didn’t make it easier it expected a very specific behavior that wasn’t obvious at first, so I had to adjust my logic just to match what it wanted.
+
+Even though it was frustrating at times, getting everything running smoothly and without memory leaks felt really rewarding. I walked away understanding how small details in C++ can turn into big issues, and how satisfying it is when all the moving parts finally work together.

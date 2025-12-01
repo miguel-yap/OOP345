@@ -1,3 +1,16 @@
+/* Citation and Sources.... 
+Assignment 04
+Module: Workstation
+FileName: Workstation.h
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 30, 2025
+------------------------------------------------------------------
+I declare that this submission is the result of my own work and I only copied the code that my professor provided to complete my assignments. 
+This submitted piece of work has not been shared with any other student or 3rd party content provider.
+------------------------------------------------------------------*/
 #ifndef SENECA_WORKSTATION_H
 #define SENECA_WORKSTATION_H
 
@@ -7,7 +20,6 @@
 #include "CustomerOrder.h"
 
 namespace seneca {
-    // Global queues are declared here, defined in Workstation.cpp
     extern std::deque<CustomerOrder> g_pending;
     extern std::deque<CustomerOrder> g_completed;
     extern std::deque<CustomerOrder> g_incomplete;
@@ -19,7 +31,6 @@ namespace seneca {
     public:
         Workstation(const std::string& record);
 
-        // Disallow Copy/Move operations
         Workstation(const Workstation&) = delete;
         Workstation& operator=(const Workstation&) = delete;
         Workstation(Workstation&&) = delete;

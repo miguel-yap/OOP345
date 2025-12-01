@@ -1,10 +1,23 @@
+/* Citation and Sources.... 
+Assignment 04
+Module: Workstation
+FileName: Workstation.cpp
+------------------------------------------------------------------
+Author: Miguel Yap
+StNo: 168049237
+Email: myap1@myseneca.ca
+Date Completion: Sun, Nov 30, 2025
+------------------------------------------------------------------
+- Line 34-59 was assisted with the help of ChatGPT.
+- Line 70-78 was assisted with the help of ChatGPT.
+------------------------------------------------------------------*/
+
 #include <iostream>
 #include <iomanip>
 #include "Workstation.h"
 #include "CustomerOrder.h"
 
 namespace seneca {
-    // Define global queues
     std::deque<CustomerOrder> g_pending;
     std::deque<CustomerOrder> g_completed;
     std::deque<CustomerOrder> g_incomplete;
@@ -13,11 +26,11 @@ namespace seneca {
 
     void Workstation::fill(std::ostream& os) {
         if (!m_orders.empty()) {
-            // Fills one item in the order at the front of the queue
             m_orders.front().fillItem(*this, os);
         }
     }
-
+    
+    // The following display function implementation was developed with guidance from ChatGPT.
     bool Workstation::attemptToMoveOrder() {
         if (m_orders.empty()) {
             return false;
@@ -26,17 +39,11 @@ namespace seneca {
         CustomerOrder& currentOrder = m_orders.front();
         bool filledAtThisStation = currentOrder.isItemFilled(getItemName());
 
-        // An order MUST move if:
-        // 1. It is fully filled for the item at this station (filledAtThisStation == true), OR
-        // 2. The station is out of stock (getQuantity() == 0). This prevents the infinite loop.
-        // If an order is not filled, and stock is 0, it must move to mark the item incomplete later.
         if (filledAtThisStation || getQuantity() == 0) {
             
-            // 1. Move to Next Station or Final Queue
             if (m_pNextStation) {
                 *m_pNextStation += std::move(currentOrder);
             } else {
-                // End of the line.
                 if (currentOrder.isOrderFilled()) {
                     g_completed.push_back(std::move(currentOrder));
                 } else {
@@ -44,12 +51,10 @@ namespace seneca {
                 }
             }
             
-            // 2. Remove from current queue
             m_orders.pop_front();
             return true;
         }
 
-        // Otherwise, hold the order back (it still needs service and we still have stock).
         return false; 
     }
 
@@ -61,6 +66,7 @@ namespace seneca {
         return m_pNextStation;
     }
 
+    // The following display function implementation was developed with guidance from ChatGPT.
     void Workstation::display(std::ostream& os) const {
         os << getItemName() << " --> ";
         if (m_pNextStation) {
