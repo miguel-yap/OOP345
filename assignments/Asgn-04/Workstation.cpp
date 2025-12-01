@@ -29,12 +29,14 @@ namespace seneca {
         // An order MUST move if:
         // 1. It is fully filled for the item at this station (filledAtThisStation == true), OR
         // 2. The station is out of stock (getQuantity() == 0). This prevents the infinite loop.
+        // If an order is not filled, and stock is 0, it must move to mark the item incomplete later.
         if (filledAtThisStation || getQuantity() == 0) {
             
+            // 1. Move to Next Station or Final Queue
             if (m_pNextStation) {
                 *m_pNextStation += std::move(currentOrder);
             } else {
-                // End of the line. Check completion status.
+                // End of the line.
                 if (currentOrder.isOrderFilled()) {
                     g_completed.push_back(std::move(currentOrder));
                 } else {
@@ -42,6 +44,7 @@ namespace seneca {
                 }
             }
             
+            // 2. Remove from current queue
             m_orders.pop_front();
             return true;
         }
