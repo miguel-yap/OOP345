@@ -94,7 +94,7 @@ namespace seneca {
     }
 
     bool CustomerOrder::isItemFilled(const std::string& itemName) const {
-        // If the item doesn't exist in the order, return true.
+        // If the item doesn't exist in the order, this query returns true.
         bool itemExists = false;
         for (size_t i = 0; i < m_cntItem; ++i) {
             if (m_lstItem[i]->m_itemName == itemName) {
@@ -104,28 +104,33 @@ namespace seneca {
                 }
             }
         }
-        return itemExists || !itemExists; // Returns true if no matching item found, or if all matching items are filled
+        return !itemExists || itemExists; // Simplified to always return true if no unfilled item is found (includes case where itemExists is false)
     }
 
     void CustomerOrder::fillItem(Station& station, std::ostream& os) {
-    bool itemFound = false; // REMOVE THIS LINE
+        // Removed: bool itemFound = false; to fix the [-Wunused-but-set-variable] warning
 
-    // Iterate through items to find the first matching, unfilled item
-    for (size_t i = 0; i < m_cntItem; ++i) {
-        if (m_lstItem[i]->m_itemName == station.getItemName() && !m_lstItem[i]->m_isFilled) {
-            // itemFound = true; // REMOVE OR COMMENT OUT THIS LINE
-            if (station.getQuantity() > 0) {
-                // Fill the order
-                // ... (rest of the filling logic) ...
-                break; // Fill one item and exit
-            } else {
-                // Inventory is empty
-                // ... (print unable to fill message) ...
-                break; // Print message and exit
+        // Iterate through items to find the first matching, unfilled item
+        for (size_t i = 0; i < m_cntItem; ++i) {
+            if (m_lstItem[i]->m_itemName == station.getItemName() && !m_lstItem[i]->m_isFilled) {
+                // itemFound is implicitly true here, but we don't need the flag.
+                
+                if (station.getQuantity() > 0) {
+                    // Fill the order
+                    station.updateQuantity();
+                    m_lstItem[i]->m_serialNumber = station.getNextSerialNumber();
+                    m_lstItem[i]->m_isFilled = true;
+                    
+                    os << "    Filled " << m_name << ", " << m_product << " [" << m_lstItem[i]->m_itemName << "]" << std::endl;
+                    break; // Fill one item and exit
+                } else {
+                    // Inventory is empty
+                    os << "    Unable to fill " << m_name << ", " << m_product << " [" << m_lstItem[i]->m_itemName << "]" << std::endl;
+                    break; // Print message and exit (stop checking this item type)
+                }
             }
         }
     }
-}
 
     void CustomerOrder::display(std::ostream& os) const {
         os << m_name << " - " << m_product << std::endl;
