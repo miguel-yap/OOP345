@@ -17,29 +17,31 @@ namespace seneca {
     }
 
     bool Workstation::attemptToMoveOrder() {
-        if (m_orders.empty()) {
-            return false;
-        }
-
-        CustomerOrder& order = m_orders.front();
-
-        // if order for this item is filled OR this station has no inventory
-        if (order.isItemFilled(getItemName()) || getQuantity() == 0u) {
-            if (m_pNextStation) {
-                *m_pNextStation += std::move(order);
-            } else {
-                if (order.isOrderFilled()) {
-                    g_completed.push_back(std::move(order));
-                } else {
-                    g_incomplete.push_back(std::move(order));
-                }
-            }
-            m_orders.pop_front();
-            return true;
-        }
-
+    if (m_orders.empty())
         return false;
+
+    // Reference to the front order
+    auto& order = m_orders.front();
+
+    // If this station's item is filled OR station cannot fill it
+    if (order.isItemFilled(getItemName()) || getQuantity() == 0) {
+
+        if (m_pNextStation) {
+            *m_pNextStation += std::move(order);
+        } else {
+            if (order.isOrderFilled())
+                g_completed.push_back(std::move(order));
+            else
+                g_incomplete.push_back(std::move(order));
+        }
+
+        m_orders.pop_front();
+        return true;
     }
+
+    return false;
+}
+
 
     void Workstation::setNextStation(Workstation* station) {
         m_pNextStation = station;
