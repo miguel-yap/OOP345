@@ -74,25 +74,28 @@ m_cntCustomerOrder = g_pending.size();
         m_activeLine = std::move(ordered);
     }
 
-    bool LineManager::run(std::ostream& os) {
-        static size_t iteration = 0u;
-        os << "Line Manager Iteration: " << ++iteration << '\n';
+   bool LineManager::run(std::ostream& os) {
+    static size_t iteration = 0u;
+    os << "Line Manager Iteration: " << ++iteration << '\n';
 
-        if (!g_pending.empty()) {
-            *m_firstStation += std::move(g_pending.front());
-            g_pending.pop_front();
-        }
-
-        for (auto* ws : m_activeLine) {
-            ws->fill(os);
-        }
-
-        for (auto* ws : m_activeLine) {
-            ws->attemptToMoveOrder();
-        }
-
-        return (g_completed.size() + g_incomplete.size()) == m_cntCustomerOrder;
+    if (!g_pending.empty()) {
+        *m_firstStation += std::move(g_pending.front());
+        g_pending.pop_front();
     }
+
+    // 1) fill from first to last
+    for (auto* ws : m_activeLine) {
+        ws->fill(os);
+    }
+
+    // 2) move from LAST to FIRST so each order moves at most one station
+    for (auto it = m_activeLine.rbegin(); it != m_activeLine.rend(); ++it) {
+        (*it)->attemptToMoveOrder();
+    }
+
+    return (g_completed.size() + g_incomplete.size()) == m_cntCustomerOrder;
+}
+
 
     void LineManager::display(std::ostream& os) const {
         for (auto* ws : m_activeLine) {
